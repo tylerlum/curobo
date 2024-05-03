@@ -66,7 +66,8 @@ X_W_H = X_W_Oy @ X_Oy_H
 q_algr_pre = joint_angles
 
 # %%
-X_W_H[0, 3] -= 0.05
+# HACK
+# X_W_H[0, 3] -= 0.05
 
 # %%
 if not hasattr(pb, "HAS_BEEN_INITIALIZED"):
