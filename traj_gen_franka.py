@@ -12,33 +12,8 @@ from curobo.util_file import (
     join_path,
     load_yaml,
     )
-from curobo.wrap.reacher.motion_gen import MotionGen, MotionGenConfig
+from curobo.wrap.reacher.motion_gen import MotionGen, MotionGenConfig, MotionGenPlanConfig, PoseCostMetric
 from scipy.spatial.transform import Rotation
-
-
-parser = ArgumentParser()
-parser.add_argument("--grasp_idx", type=int, default=0)
-parser.add_argument("--traj_len", type=int, default=6)
-parser.add_argument("--pause", action="store_true", default=False)
-args = parser.parse_args()
-
-
-tensor_args = TensorDeviceType()
-world_file = "my_scene.yml"
-robot_file = "fr3_algr_zed2i.yml"
-motion_gen_config = MotionGenConfig.load_from_robot_config(
-    robot_file,
-    world_file,
-    tensor_args,
-    trajopt_tsteps=args.traj_len+3,
-    collision_checker_type=CollisionCheckerType.MESH,
-    use_cuda_graph=True,
-)
-motion_gen = MotionGen(motion_gen_config)
-robot_cfg = load_yaml(join_path(get_robot_configs_path(), robot_file))["robot_cfg"]
-robot_cfg = RobotConfig.from_dict(robot_cfg, tensor_args)
-retract_cfg = motion_gen.get_retract_config()
-
 
 DEFAULT_Q_FR3 = np.array(
     [
@@ -72,6 +47,37 @@ DEFAULT_Q_ALGR = np.array(
     ]
 )
 DEFAULT_Q = np.concatenate([DEFAULT_Q_FR3, DEFAULT_Q_ALGR])
+
+
+
+parser = ArgumentParser()
+parser.add_argument("--grasp_idx", type=int, default=0)
+parser.add_argument("--traj_len", type=int, default=6)
+parser.add_argument("--pause", action="store_true", default=False)
+args = parser.parse_args()
+
+
+tensor_args = TensorDeviceType()
+world_file = "my_scene.yml"
+robot_file = "fr3_algr_zed2i.yml"
+robot_cfg = load_yaml(join_path(get_robot_configs_path(), robot_file))["robot_cfg"]
+robot_cfg = RobotConfig.from_dict(robot_cfg, tensor_args)
+robot_cfg.kinematics.kinematics_config.joint_limits.position[0, 7:] = torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() - 0.01
+robot_cfg.kinematics.kinematics_config.joint_limits.position[1, 7:] = torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() + 0.01
+motion_gen_config = MotionGenConfig.load_from_robot_config(
+    robot_cfg,
+    world_file,
+    tensor_args,
+    trajopt_tsteps=args.traj_len+3,
+    collision_checker_type=CollisionCheckerType.MESH,
+    use_cuda_graph=True,
+)
+motion_gen = MotionGen(motion_gen_config)
+robot_cfg = load_yaml(join_path(get_robot_configs_path(), robot_file))["robot_cfg"]
+robot_cfg = RobotConfig.from_dict(robot_cfg, tensor_args)
+retract_cfg = motion_gen.get_retract_config()
+
+
 # #Should be forward kinematics
 # state = motion_gen.rollout_fn.compute_kinematics(
 #     JointState.from_position(retract_cfg.view(1, -1))
@@ -148,14 +154,17 @@ quat_wxyz = transforms3d.quaternions.mat2quat(rot_matrix)
 target_pose = Pose(torch.from_numpy(trans).float().cuda(), quaternion=torch.from_numpy(quat_wxyz).float().cuda())
 start_state = JointState.from_position(torch.from_numpy(DEFAULT_Q).float().cuda().view(1, -1))
 t_start = time.time()
-result = motion_gen.plan(
-        start_state,
-        target_pose,
-        enable_graph=True,
-        enable_opt=False,
-        max_attempts=10,
-        num_trajopt_seeds=10,
-        num_graph_seeds=10)
+result = motion_gen.plan_single(
+        start_state=start_state,
+        goal_pose=target_pose,
+        plan_config=MotionGenPlanConfig(
+            enable_graph=True,
+            enable_opt=False,
+            max_attempts=10,
+            num_trajopt_seeds=10,
+            num_graph_seeds=10,
+        ),
+)
 breakpoint()
 if result is None:
     print("IK Failed!")
