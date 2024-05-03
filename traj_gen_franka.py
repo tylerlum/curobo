@@ -177,12 +177,14 @@ traj = result.interpolated_plan
 
 for t in range(len(traj.position)):
     position = traj.position[t].cpu().numpy()
-    assert position.shape == (7,)
+    assert position.shape == (DEFAULT_Q.shape[0],)
     print(f"{t} / {len(traj.position)} {position}")
     #print(position)
 
     for i, joint_idx in enumerate(arm_actuatable_joint_idxs):
         pb.resetJointState(r, joint_idx, position[i])
+    for i, joint_idx in enumerate(hand_actuatable_joint_idxs):
+        pb.resetJointState(r, joint_idx, position[i+7])
     if args.pause: 
         input()
     time.sleep(0.001)
