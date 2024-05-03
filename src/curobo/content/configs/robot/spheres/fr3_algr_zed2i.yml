@@ -12,76 +12,76 @@
 collision_spheres:
     fr3_link0:
         - "center": [0.0, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, 0.0, 0.075]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, 0.0, 0.15]
-          "radius": 0.075
+          "radius": 0.001
     fr3_link1:
         - "center": [0.0, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, -0.053, 0.053]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, 0.022, 0.053]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, 0.097, 0.053]
-          "radius": 0.075
+          "radius": 0.001
     fr3_link2:
         - "center": [0.0, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, -0.053, -0.053]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, -0.128, -0.053]
-          "radius": 0.075
+          "radius": 0.001
     fr3_link3:
         - "center": [0.0, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.053, 0.0, 0.053]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.075, 0.053, 0.053]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.075, -0.053, 0.053]
-          "radius": 0.075
+          "radius": 0.001
     fr3_link4:
         - "center": [0.0, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [-0.053, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [-0.053, 0.075, -0.03]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [-0.053, 0.15, -0.03]
-          "radius": 0.075
+          "radius": 0.001
     fr3_link5:
         - "center": [0.0, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, 0.053, 0.053]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, 0.053, 0.128]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, -0.053, 0.128]
-          "radius": 0.075
+          "radius": 0.001
     fr3_link6:
         - "center": [0.0, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.075, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
     fr3_link7:
         - "center": [0.0, 0.0, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, 0.053, 0.0]
-          "radius": 0.075
+          "radius": 0.001
         - "center": [0.0, 0.102, 0.045]
-          "radius": 0.03
+          "radius": 0.001
         - "center": [-0.02, 0.082, 0.045]
-          "radius": 0.03
+          "radius": 0.001
         - "center": [-0.04, 0.062, 0.045]
-          "radius": 0.03
+          "radius": 0.001
         - "center": [-0.06, 0.042, 0.045]
-          "radius": 0.03
+          "radius": 0.001
         - "center": [-0.08, 0.022, 0.045]
-          "radius": 0.03
+          "radius": 0.001
         - "center": [-0.10, 0.002, 0.045]
-          "radius": 0.03
+          "radius": 0.001
     algr_rh_palm:
         - "center": [-0.01, 0.0, -0.02]
           "radius": 0.03
