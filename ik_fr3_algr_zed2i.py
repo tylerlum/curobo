@@ -52,6 +52,8 @@ def solve_ik(
     obj_xyz: Tuple[float, float, float] = (0.65, 0.0, 0.0),
     obj_quat_wxyz: Tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0),
     collision_check_table: bool = True,
+    raise_if_no_solution: bool = True,
+    warn_if_no_solution: bool = False,
 ) -> np.ndarray:
     assert X_W_H.shape == (4, 4), f"X_W_H.shape: {X_W_H.shape}"
     trans = X_W_H[:3, 3]
@@ -105,11 +107,13 @@ def solve_ik(
 
     result = ik_solver.solve_single(target_pose)
     if not result.success.item():
-        raise RuntimeError("IK failed to find a solution.")
+        if raise_if_no_solution:
+            raise RuntimeError("IK failed to find a valid solution.")
+        elif warn_if_no_solution:
+            print("WARNING: IK failed to find a valid solution.")
 
-    q_solution = result.solution[result.success]
-    assert q_solution.shape == (1, 23)
-    return q_solution.squeeze(dim=0).detach().cpu().numpy()
+    assert result.solution.shape == (1, 1, 23)
+    return result.solution.squeeze(dim=0).squeeze(dim=0).detach().cpu().numpy()
 
 
 def max_penetration_from_q(
@@ -122,8 +126,7 @@ def max_penetration_from_q(
     obj_quat_wxyz: Tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0),
     include_table: bool = True,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    N = q.shape[0]
-    assert q.shape == (N, 23), f"q.shape: {q.shape}"
+    assert q.shape == (23,), f"q.shape: {q.shape}"
 
     robot_file = "fr3_algr_zed2i.yml"
     robot_cfg = RobotConfig.from_dict(
@@ -143,9 +146,12 @@ def max_penetration_from_q(
     )
     curobo_fn = RobotWorld(config)
     d_world, d_self = curobo_fn.get_world_self_collision_distance_from_joints(
-        torch.from_numpy(q).float().cuda()
+        torch.from_numpy(q[None, ...]).float().cuda()
     )
-    return d_world.detach().cpu().numpy(), d_self.detach().cpu().numpy()
+    return (
+        d_world.squeeze(dim=0).detach().cpu().numpy(),
+        d_self.squeeze(dim=0).detach().cpu().numpy(),
+    )
 
 
 def max_penetration_from_X_W_H(
@@ -160,17 +166,24 @@ def max_penetration_from_X_W_H(
     include_table: bool = True,
 ) -> Tuple[np.ndarray, np.ndarray]:
 
-    try:
-        q_solution = solve_ik(
-            X_W_H=X_W_H, q_algr_constraint=q_algr_constraint, collision_check_object=True, obj_filepath=obj_filepath, obj_xyz=obj_xyz, obj_quat_wxyz=obj_quat_wxyz, collision_check_table=True,
-        )
-        print("No penetrations found")
-        return max_
-    except RuntimeError:
-        q_solution = solve_ik(
-            X_W_H=X_W_H, q_algr_constraint=q_algr_constraint, collision_check_object=False
-        )
-    
+    q_solution = solve_ik(
+        X_W_H=X_W_H,
+        q_algr_constraint=q_algr_constraint,
+        collision_check_object=True,
+        obj_filepath=obj_filepath,
+        obj_xyz=obj_xyz,
+        obj_quat_wxyz=obj_quat_wxyz,
+        collision_check_table=True,
+        raise_if_no_solution=False,
+    )
+    return max_penetration_from_q(
+        q=q_solution,
+        include_object=include_object,
+        obj_filepath=obj_filepath,
+        obj_xyz=obj_xyz,
+        obj_quat_wxyz=obj_quat_wxyz,
+        include_table=include_table,
+    )
 
 
 def main() -> None:
@@ -231,6 +244,7 @@ def main() -> None:
     print(f"q_feasible_2: {q_feasible_2}")
     print(f"q_feasible_3: {q_feasible_3}")
 
+    print("=" * 80)
     try:
         q_collide_object = solve_ik(
             X_W_H=X_W_H_collide_object, q_algr_constraint=q_algr_pre, collision_check_object=True
@@ -238,7 +252,25 @@ def main() -> None:
         raise RuntimeError("Collision check failed to detect collision.")
     except RuntimeError:
         print("Collision check successfully detected collision.")
+        max_penetration_collide_object = max_penetration_from_X_W_H(
+            X_W_H=X_W_H_collide_object, q_algr_constraint=q_algr_pre, include_object=True
+        )
+        print(f"max_penetration_collide_object = {max_penetration_collide_object}")
+        max_penetration_collide_object_turn_off_object = max_penetration_from_X_W_H(
+            X_W_H=X_W_H_collide_object, q_algr_constraint=q_algr_pre, include_object=False
+        )
+        print(
+            f"max_penetration_collide_object_turn_off_object = {max_penetration_collide_object_turn_off_object}"
+        )
+        max_penetration_collide_object_turn_off_table = max_penetration_from_X_W_H(
+            X_W_H=X_W_H_collide_object, q_algr_constraint=q_algr_pre, include_table=False
+        )
+        print(
+            f"max_penetration_collide_object_turn_off_table = {max_penetration_collide_object_turn_off_table}"
+        )
+    print("=" * 80 + "\n")
 
+    print("=" * 80)
     try:
         q_collide_table = solve_ik(
             X_W_H=X_W_H_collide_table, q_algr_constraint=q_algr_pre, collision_check_object=False
@@ -246,6 +278,23 @@ def main() -> None:
         raise RuntimeError("Collision check failed to detect collision.")
     except RuntimeError:
         print("Collision check successfully detected collision.")
+        max_penetration_collide_table = max_penetration_from_X_W_H(
+            X_W_H=X_W_H_collide_table, q_algr_constraint=q_algr_pre, include_table=True
+        )
+        print(f"max_penetration_collide_table = {max_penetration_collide_table}")
+        max_penetration_collide_table_turn_off_table = max_penetration_from_X_W_H(
+            X_W_H=X_W_H_collide_table, q_algr_constraint=q_algr_pre, include_table=False
+        )
+        print(
+            f"max_penetration_collide_table_turn_off_table = {max_penetration_collide_table_turn_off_table}"
+        )
+        max_penetration_collide_table_turn_off_object = max_penetration_from_X_W_H(
+            X_W_H=X_W_H_collide_table, q_algr_constraint=q_algr_pre, include_object=False
+        )
+        print(
+            f"max_penetration_collide_table_turn_off_object = {max_penetration_collide_table_turn_off_object}"
+        )
+    print("=" * 80 + "\n")
 
 
 if __name__ == "__main__":
