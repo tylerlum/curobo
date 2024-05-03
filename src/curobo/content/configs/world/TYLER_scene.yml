@@ -1,13 +1,13 @@
-mesh:
-  # base_scene:
-  #   pose: [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-  #   file_path: "scene/nvblox/scene_updated.obj"
-  object:
-    pose: [0.65, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-    # file_path: "/home/ericcsr/ComplianceDexSensor/obj_cropped.obj"
-    # file_path: "/juno/u/tylerlum/Downloads/10cm_Cube.obj"
-    # file_path: "/juno/u/tylerlum/github_repos/pybullet-object-models/pybullet_object_models/ycb_objects/YcbBanana/collision_vhacd.obj"
-    file_path: "/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/decomposed.obj"
+# mesh:
+#   # base_scene:
+#   #   pose: [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+#   #   file_path: "scene/nvblox/scene_updated.obj"
+#   object:
+#     pose: [0.65, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+#     # file_path: "/home/ericcsr/ComplianceDexSensor/obj_cropped.obj"
+#     # file_path: "/juno/u/tylerlum/Downloads/10cm_Cube.obj"
+#     # file_path: "/juno/u/tylerlum/github_repos/pybullet-object-models/pybullet_object_models/ycb_objects/YcbBanana/collision_vhacd.obj"
+#     file_path: "/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/decomposed.obj"
 
 cuboid:
   table:
