@@ -19,6 +19,7 @@ from curobo.wrap.reacher.motion_gen import (
     MotionGen,
     MotionGenConfig,
     MotionGenPlanConfig,
+    MotionGenResult,
 )
 
 
@@ -67,7 +68,7 @@ def solve_trajopt(
     obj_xyz: Tuple[float, float, float] = (0.65, 0.0, 0.0),
     obj_quat_wxyz: Tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0),
     collision_check_table: bool = True,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, float]:
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, float, MotionGenResult]:
     assert X_W_H.shape == (4, 4), f"X_W_H.shape: {X_W_H.shape}"
     trans = X_W_H[:3, 3]
     rot_matrix = X_W_H[:3, :3]
@@ -155,6 +156,7 @@ def solve_trajopt(
         traj.velocity.detach().cpu().numpy(),
         traj.acceleration.detach().cpu().numpy(),
         result.optimized_dt,
+        result,
     )
 
 
@@ -204,7 +206,7 @@ def main() -> None:
         ]
     )
 
-    q, qd, qdd, dt = solve_trajopt(
+    q, qd, qdd, dt, result = solve_trajopt(
         X_W_H=X_W_H_feasible,
         q_algr_constraint=q_algr_pre,
     )

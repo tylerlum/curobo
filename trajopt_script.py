@@ -7,7 +7,7 @@ import numpy as np
 import time
 from pybullet_utils import draw_collision_spheres, remove_collision_spheres
 from trajopt_fr3_algr_zed2i import DEFAULT_Q_FR3, DEFAULT_Q_ALGR, solve_trajopt
-from ik_fr3_algr_zed2i import solve_ik, max_penetration_from_X_W_H
+from ik_fr3_algr_zed2i import solve_ik, max_penetration_from_X_W_H, max_penetration_from_q
 from tqdm import tqdm
 
 from curobo.util_file import (
@@ -41,7 +41,6 @@ assert COLLISION_SPHERES_YAML_PATH.exists()
 
 # %%
 grasp_config_dict = np.load(GRASP_CONFIG_DICTS_PATH, allow_pickle=True).item()
-breakpoint()
 BEST_IDX = 4
 GOOD_IDX = 0
 GOOD_IDX_2 = 1
@@ -65,6 +64,9 @@ X_W_Oy = X_W_N @ X_N_O @ X_O_Oy
 
 X_W_H = X_W_Oy @ X_Oy_H
 q_algr_pre = joint_angles
+
+# %%
+X_W_H[0, 3] -= 0.05
 
 # %%
 if not hasattr(pb, "HAS_BEEN_INITIALIZED"):
@@ -140,17 +142,35 @@ d_world, d_self = max_penetration_from_X_W_H(
     include_table=True,
 )
 print(f"d_world = {d_world}, d_self = {d_self}")
+if d_world.item() > 0.0:
+    print("WARNING: penetration with world detected")
+if d_self.item() > 0.0:
+    print("WARNING: self collision detected")
 
 # %%
-q, qd, qdd, dt = solve_trajopt(
-    X_W_H=X_W_H,
-    q_algr_constraint=q_algr_pre,
-    collision_check_object=True,
-    obj_filepath=OBJECT_OBJ_PATH,
-    obj_xyz=(0.65, 0.0, 0.0),
-    obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
-    collision_check_table=True,
-)
+try:
+    q, qd, qdd, dt, _ = solve_trajopt(
+        X_W_H=X_W_H,
+        q_algr_constraint=q_algr_pre,
+        collision_check_object=True,
+        obj_filepath=OBJECT_OBJ_PATH,
+        obj_xyz=(0.65, 0.0, 0.0),
+        obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+        collision_check_table=True,
+    )
+except RuntimeError as e:
+    print(f"FAILED TRAJOPT: {e}, retrying without object")
+    q, qd, qdd, dt, _ = solve_trajopt(
+        X_W_H=X_W_H,
+        q_algr_constraint=q_algr_pre,
+        collision_check_object=False,
+        obj_filepath=OBJECT_OBJ_PATH,
+        obj_xyz=(0.65, 0.0, 0.0),
+        obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+        collision_check_table=True,
+    )
+    print("Succeeded without object")
+
 print(f"q.shape = {q.shape}, qd.shape = {qd.shape}, qdd.shape = {qdd.shape}, dt = {dt}")
 N_pts = q.shape[0]
 assert q.shape == (N_pts, 23)
@@ -179,4 +199,76 @@ draw_collision_spheres(
 # for i, joint_idx in enumerate(hand_actuatable_joint_idxs):
 #     pb.resetJointState(r, joint_idx, q_solution[0, i + 7])
 
-# %%
+# # %%
+# 
+# 
+# q_solution = solve_ik(
+#     X_W_H=X_W_H,
+#     q_algr_constraint=q_algr_pre,
+#     collision_check_object=True,
+#     obj_filepath=OBJECT_OBJ_PATH,
+#     obj_xyz=(0.65, 0.0, 0.0),
+#     obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+#     collision_check_table=True,
+#     raise_if_no_solution=True,
+# )
+# # %%
+# 
+# max_penetration_from_X_W_H(
+#     X_W_H=X_W_H,
+#     q_algr_constraint=q_algr_pre,
+#     include_object=True,
+#     obj_filepath=OBJECT_OBJ_PATH,
+#     obj_xyz=(0.65, 0.0, 0.0),
+#     obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+#     include_table=True,
+# )
+# # %%
+# q_solution = solve_ik(
+#     X_W_H=X_W_H,
+#     q_algr_constraint=q_algr_pre,
+#     collision_check_object=True,
+#     obj_filepath=OBJECT_OBJ_PATH,
+#     obj_xyz=(0.65, 0.0, 0.0),
+#     obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+#     collision_check_table=True,
+#     raise_if_no_solution=False,
+# )
+# # %%
+# q_solution
+# # %%
+# max_penetration_from_q(
+#     q=q_solution,
+#     include_object=True,
+#     obj_filepath=OBJECT_OBJ_PATH,
+#     obj_xyz=(0.65, 0.0, 0.0),
+#     obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+#     include_table=True,
+# )
+# 
+# # %%
+# 
+# for i, joint_idx in enumerate(arm_actuatable_joint_idxs):
+#     pb.resetJointState(r, joint_idx, q_solution[i])
+# for i, joint_idx in enumerate(hand_actuatable_joint_idxs):
+#     pb.resetJointState(r, joint_idx, q_solution[i + 7])
+# 
+# # %%
+# q_solution2 = solve_ik(
+#     X_W_H=X_W_H,
+#     q_algr_constraint=q_algr_pre,
+#     collision_check_object=False,
+#     obj_filepath=OBJECT_OBJ_PATH,
+#     obj_xyz=(0.65, 0.0, 0.0),
+#     obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+#     collision_check_table=True,
+#     raise_if_no_solution=True,
+# )
+# # %%
+# for i, joint_idx in enumerate(arm_actuatable_joint_idxs):
+#     pb.resetJointState(r, joint_idx, q_solution2[i])
+# for i, joint_idx in enumerate(hand_actuatable_joint_idxs):
+#     pb.resetJointState(r, joint_idx, q_solution2[i + 7])
+# 
+# # %%
+# 
