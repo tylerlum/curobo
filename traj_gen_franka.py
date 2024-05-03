@@ -25,7 +25,7 @@ args = parser.parse_args()
 
 tensor_args = TensorDeviceType()
 world_file = "my_scene.yml"
-robot_file = "franka.yml"
+robot_file = "fr3_algr_zed2i.yml"
 motion_gen_config = MotionGenConfig.load_from_robot_config(
     robot_file,
     world_file,
@@ -71,6 +71,7 @@ DEFAULT_Q_ALGR = np.array(
         -6.50969000e-03,
     ]
 )
+DEFAULT_Q = np.concatenate([DEFAULT_Q_FR3, DEFAULT_Q_ALGR])
 # #Should be forward kinematics
 # state = motion_gen.rollout_fn.compute_kinematics(
 #     JointState.from_position(retract_cfg.view(1, -1))
@@ -86,9 +87,11 @@ assert num_total_joints == 39
 # obj = pb.loadURDF("/juno/u/tylerlum/github_repos/DexGraspNet/data/rotated_meshdata/core-bottle-109d55a137c042f5760315ac3bf2c13e/coacd/coacd.urdf", useFixedBase=True, basePosition=[1, 1, 1], baseOrientation=[0, 0, 0, 1])
 obj = pb.loadURDF("/juno/u/tylerlum/github_repos/pybullet-object-models/pybullet_object_models/ycb_objects/YcbBanana/model.urdf", useFixedBase=True, basePosition=[0.65, 0, 0,], baseOrientation=[0, 0, 0, 1])
 
-
-FIXED_JOINT = 4
-actuatable_joint_idxs = [i for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != FIXED_JOINT]
+joint_names = [pb.getJointInfo(r, i)[1].decode("utf-8") for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED]
+link_names = [pb.getJointInfo(r, i)[12].decode("utf-8") for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED]
+print(f"joint_names = {joint_names}")
+print(f"link_names = {link_names}")
+actuatable_joint_idxs = [i for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED]
 num_actuatable_joints = len(actuatable_joint_idxs)
 assert num_actuatable_joints == 23
 arm_actuatable_joint_idxs = actuatable_joint_idxs[:7]
@@ -105,9 +108,13 @@ successes = []
 
 X_W_H = np.array(
     [
-        [-0.40069854, 0.06362686, 0.91399777, 0.66515265],
-        [-0.367964, 0.90242159, -0.22413731, 0.02321906],
-        [-0.83907259, -0.4261297, -0.33818674, 0.29229766],
+        # [-0.40069854, 0.06362686, 0.91399777, 0.66515265],
+        # [-0.367964, 0.90242159, -0.22413731, 0.02321906],
+        # [-0.83907259, -0.4261297, -0.33818674, 0.29229766],
+        # [0.0, 0.0, 0.0, 1.0],
+        [0, 0, 1, 0.4],
+        [0, 1, 0, 0.0],
+        [-1, 0, 0, 0.3],
         [0.0, 0.0, 0.0, 1.0],
     ]
 )
@@ -139,7 +146,7 @@ import transforms3d
 quat_wxyz = transforms3d.quaternions.mat2quat(rot_matrix)
 
 target_pose = Pose(torch.from_numpy(trans).float().cuda(), quaternion=torch.from_numpy(quat_wxyz).float().cuda())
-start_state = JointState.from_position(torch.from_numpy(DEFAULT_Q_FR3).float().cuda().view(1, -1))
+start_state = JointState.from_position(torch.from_numpy(DEFAULT_Q).float().cuda().view(1, -1))
 t_start = time.time()
 result = motion_gen.plan(
         start_state,
@@ -149,6 +156,7 @@ result = motion_gen.plan(
         max_attempts=10,
         num_trajopt_seeds=10,
         num_graph_seeds=10)
+breakpoint()
 if result is None:
     print("IK Failed!")
     successes.append(False)
@@ -177,12 +185,10 @@ for t in range(len(traj.position)):
         pb.resetJointState(r, joint_idx, position[i])
     if args.pause: 
         input()
-    time.sleep(0.01)
-position = result.debug_info["ik_solution"]
-for j in range(7):
-    pb.resetJointState(r, j, position[j])
+    time.sleep(0.001)
 if args.pause:
     input()
+breakpoint()
 successes.append(True)
 trajs.append(np.vstack([traj.position.cpu().numpy(), position.cpu().numpy()]))
 
