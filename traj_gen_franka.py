@@ -13,9 +13,15 @@ from curobo.util_file import (
     get_robot_configs_path,
     join_path,
     load_yaml,
-    )
-from curobo.wrap.reacher.motion_gen import MotionGen, MotionGenConfig, MotionGenPlanConfig, PoseCostMetric
+)
+from curobo.wrap.reacher.motion_gen import (
+    MotionGen,
+    MotionGenConfig,
+    MotionGenPlanConfig,
+    PoseCostMetric,
+)
 from scipy.spatial.transform import Rotation
+
 
 def get_link_com_xyz_orn(pb, body_id, link_id):
     # get the world transform (xyz and quaternion) of the Center of Mass of the link
@@ -28,9 +34,16 @@ def get_link_com_xyz_orn(pb, body_id, link_id):
     return list(link_com), list(link_quat)
 
 
-def create_primitive_shape(pb, mass, shape, dim, color=(0.6, 0, 0, 1), 
-                           collidable=True, init_xyz=(0, 0, 0),
-                           init_quat=(0, 0, 0, 1)):
+def create_primitive_shape(
+    pb,
+    mass,
+    shape,
+    dim,
+    color=(0.6, 0, 0, 1),
+    collidable=True,
+    init_xyz=(0, 0, 0),
+    init_quat=(0, 0, 0, 1),
+):
     # shape: p.GEOM_SPHERE or p.GEOM_BOX or p.GEOM_CYLINDER
     # dim: halfExtents (vec3) for box, (radius, length)vec2 for cylinder, (radius) for sphere
     # init_xyz vec3 being initial obj location, init_quat being initial obj orientation
@@ -49,35 +62,73 @@ def create_primitive_shape(pb, mass, shape, dim, color=(0.6, 0, 0, 1),
         if collidable:
             collision_shape_id = pb.createCollisionShape(shape, radius=dim[0])
 
-    sid = pb.createMultiBody(baseMass=mass, baseInertialFramePosition=[0, 0, 0],
-                             baseCollisionShapeIndex=collision_shape_id,
-                             baseVisualShapeIndex=visual_shape_id,
-                             basePosition=init_xyz, baseOrientation=init_quat)
+    sid = pb.createMultiBody(
+        baseMass=mass,
+        baseInertialFramePosition=[0, 0, 0],
+        baseCollisionShapeIndex=collision_shape_id,
+        baseVisualShapeIndex=visual_shape_id,
+        basePosition=init_xyz,
+        baseOrientation=init_quat,
+    )
     return sid
 
 
-
 def draw_collision_spheres(robot, config):
+    from collections import defaultdict
+
     link_names = {"world": -1}
     for i in range(pb.getNumJoints(robot)):
         link_names[pb.getJointInfo(robot, i)[12].decode("utf-8")] = i
 
-    color_codes = [[1,0,0,0.7],[0,1,0,0.7]]
+    color_codes = [[1, 0, 0, 0.7], [0, 1, 0, 0.7]]
 
-    for i, link in enumerate(config["collision_spheres"].keys()):
-        if link not in link_names:
-            continue
+    if not hasattr(draw_collision_spheres, "cached_spheres"):
+        draw_collision_spheres.cached_spheres = defaultdict(list)
+        for i, link in enumerate(config["collision_spheres"].keys()):
+            if link not in link_names:
+                continue
 
-        link_id = link_names[link]
-        link_pos, link_ori = get_link_com_xyz_orn(pb, robot, link_id)
-        for sphere in config["collision_spheres"][link]:
-            s = create_primitive_shape(pb, 0.0, shape=pb.GEOM_SPHERE, dim=(sphere["radius"],), collidable=False, color=color_codes[i%2])
-            # Place the sphere relative to the link
-            world_coord = list(pb.multiplyTransforms(link_pos, link_ori, sphere["center"], [0,0,0,1])[0])
-            world_coord[1] += 0.
-            pb.resetBasePositionAndOrientation(s, world_coord, [0,0,0,1])
+            link_id = link_names[link]
+            link_pos, link_ori = get_link_com_xyz_orn(pb, robot, link_id)
+            for sphere in config["collision_spheres"][link]:
+                s = create_primitive_shape(
+                    pb,
+                    0.0,
+                    shape=pb.GEOM_SPHERE,
+                    dim=(sphere["radius"],),
+                    collidable=False,
+                    color=color_codes[i % 2],
+                )
+                # Place the sphere relative to the link
+                world_coord = list(
+                    pb.multiplyTransforms(link_pos, link_ori, sphere["center"], [0, 0, 0, 1])[0]
+                )
+                world_coord[1] += 0.0
+                pb.resetBasePositionAndOrientation(s, world_coord, [0, 0, 0, 1])
+                draw_collision_spheres.cached_spheres[link].append(s)
+    else:
+        cached_spheres = draw_collision_spheres.cached_spheres
+        for i, link in enumerate(config["collision_spheres"].keys()):
+            if link not in link_names:
+                continue
 
+            link_id = link_names[link]
+            link_pos, link_ori = get_link_com_xyz_orn(pb, robot, link_id)
+            for j, sphere in enumerate(config["collision_spheres"][link]):
+                s = cached_spheres[link][j]
 
+                # Place the sphere relative to the link
+                world_coord = list(
+                    pb.multiplyTransforms(link_pos, link_ori, sphere["center"], [0, 0, 0, 1])[0]
+                )
+                world_coord[1] += 0.0
+                pb.resetBasePositionAndOrientation(s, world_coord, [0, 0, 0, 1])
+
+def remove_collision_spheres():
+    if hasattr(draw_collision_spheres, "cached_spheres"):
+        for link, spheres in draw_collision_spheres.cached_spheres.items():
+            for s in spheres:
+                pb.resetBasePositionAndOrientation(s, [100, 0, 0], [0, 0, 0, 1])
 
 
 DEFAULT_Q_FR3 = np.array(
@@ -113,24 +164,29 @@ DEFAULT_Q_ALGR = np.array(
 )
 DEFAULT_Q = np.concatenate([DEFAULT_Q_FR3, DEFAULT_Q_ALGR])
 
-grasp_config_dict = np.load("/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/optimized_grasp_config_dicts/mug_330_0_9999.npy", allow_pickle=True).item()
+grasp_config_dict = np.load(
+    "/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/optimized_grasp_config_dicts/mug_330_0_9999.npy",
+    allow_pickle=True,
+).item()
 breakpoint()
 BEST_IDX = 4
 GOOD_IDX = 0
 GOOD_IDX_2 = 1
 
-trans = grasp_config_dict['trans'][GOOD_IDX]
-rot = grasp_config_dict['rot'][GOOD_IDX]
-joint_angles = grasp_config_dict['joint_angles'][GOOD_IDX]
+trans = grasp_config_dict["trans"][GOOD_IDX]
+rot = grasp_config_dict["rot"][GOOD_IDX]
+joint_angles = grasp_config_dict["joint_angles"][GOOD_IDX]
 X_Oy_H = np.eye(4)
 X_Oy_H[:3, :3] = rot
 X_Oy_H[:3, 3] = trans
 
 # DEFAULT_Q_ALGR = joint_angles
 
-X_W_N = trimesh.transformations.translation_matrix( [0.65, 0, 0])
+X_W_N = trimesh.transformations.translation_matrix([0.65, 0, 0])
 X_O_Oy = trimesh.transformations.rotation_matrix(np.pi / 2, [1, 0, 0])
-obj_centroid = trimesh.load("/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/decomposed.obj").centroid
+obj_centroid = trimesh.load(
+    "/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/decomposed.obj"
+).centroid
 print(f"obj_centroid = {obj_centroid}")
 X_N_O = trimesh.transformations.translation_matrix(obj_centroid)
 X_W_Oy = X_W_N @ X_N_O @ X_O_Oy
@@ -147,13 +203,17 @@ world_file = "TYLER_scene.yml"
 robot_file = "fr3_algr_zed2i.yml"
 robot_cfg_dict = load_yaml(join_path(get_robot_configs_path(), robot_file))["robot_cfg"]
 robot_cfg = RobotConfig.from_dict(robot_cfg_dict, tensor_args)
-robot_cfg.kinematics.kinematics_config.joint_limits.position[0, 7:] = torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() - 0.01
-robot_cfg.kinematics.kinematics_config.joint_limits.position[1, 7:] = torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() + 0.01
+robot_cfg.kinematics.kinematics_config.joint_limits.position[0, 7:] = (
+    torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() - 0.01
+)
+robot_cfg.kinematics.kinematics_config.joint_limits.position[1, 7:] = (
+    torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() + 0.01
+)
 motion_gen_config = MotionGenConfig.load_from_robot_config(
     robot_cfg,
     world_file,
     tensor_args,
-    trajopt_tsteps=args.traj_len+3,
+    trajopt_tsteps=args.traj_len + 3,
     collision_checker_type=CollisionCheckerType.MESH,
     use_cuda_graph=True,
 )
@@ -171,19 +231,43 @@ retract_cfg = motion_gen.get_retract_config()
 pb.connect(pb.GUI)
 
 # r = pb.loadURDF("/juno/u/tylerlum/github_repos/curobo/src/curobo/content/assets/robot/franka_description/franka_panda.urdf", useFixedBase=True, basePosition=[-0.14134081,  0.50142033, -0.15], baseOrientation=[0, 0, -0.3826834, 0.9238795])
-r = pb.loadURDF("/juno/u/tylerlum/github_repos/nerf_grasping/nerf_grasping/fr3_algr_ik/allegro_ros2/models/fr3_algr_zed2i.urdf", useFixedBase=True, basePosition=[0, 0, 0], baseOrientation=[0, 0, 0, 1])
+r = pb.loadURDF(
+    "/juno/u/tylerlum/github_repos/nerf_grasping/nerf_grasping/fr3_algr_ik/allegro_ros2/models/fr3_algr_zed2i.urdf",
+    useFixedBase=True,
+    basePosition=[0, 0, 0],
+    baseOrientation=[0, 0, 0, 1],
+)
 num_total_joints = pb.getNumJoints(r)
 assert num_total_joints == 39
 
 # obj = pb.loadURDF("/juno/u/tylerlum/github_repos/DexGraspNet/data/rotated_meshdata/core-bottle-109d55a137c042f5760315ac3bf2c13e/coacd/coacd.urdf", useFixedBase=True, basePosition=[1, 1, 1], baseOrientation=[0, 0, 0, 1])
 # obj = pb.loadURDF("/juno/u/tylerlum/github_repos/pybullet-object-models/pybullet_object_models/ycb_objects/YcbBanana/model.urdf", useFixedBase=True, basePosition=[0.65, 0, 0,], baseOrientation=[0, 0, 0, 1])
-obj = pb.loadURDF("/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/coacd.urdf", useFixedBase=True, basePosition=[0.65, 0, 0,], baseOrientation=[0, 0, 0, 1])
+obj = pb.loadURDF(
+    "/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/coacd.urdf",
+    useFixedBase=True,
+    basePosition=[
+        0.65,
+        0,
+        0,
+    ],
+    baseOrientation=[0, 0, 0, 1],
+)
 
-joint_names = [pb.getJointInfo(r, i)[1].decode("utf-8") for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED]
-link_names = [pb.getJointInfo(r, i)[12].decode("utf-8") for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED]
+joint_names = [
+    pb.getJointInfo(r, i)[1].decode("utf-8")
+    for i in range(num_total_joints)
+    if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED
+]
+link_names = [
+    pb.getJointInfo(r, i)[12].decode("utf-8")
+    for i in range(num_total_joints)
+    if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED
+]
 print(f"joint_names = {joint_names}")
 print(f"link_names = {link_names}")
-actuatable_joint_idxs = [i for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED]
+actuatable_joint_idxs = [
+    i for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED
+]
 num_actuatable_joints = len(actuatable_joint_idxs)
 assert num_actuatable_joints == 23
 arm_actuatable_joint_idxs = actuatable_joint_idxs[:7]
@@ -195,6 +279,16 @@ for i, joint_idx in enumerate(arm_actuatable_joint_idxs):
 for i, joint_idx in enumerate(hand_actuatable_joint_idxs):
     pb.resetJointState(r, joint_idx, DEFAULT_Q_ALGR[i])
 
+collision_config = yaml.safe_load(
+    open(
+        "/juno/u/tylerlum/github_repos/curobo/src/curobo/content/configs/robot/spheres/fr3_algr_zed2i.yml",
+        "r",
+    )
+)
+draw_collision_spheres(
+    robot=r,
+    config=collision_config,
+)
 trajs = []
 successes = []
 
@@ -238,30 +332,34 @@ trans = X_W_H[:3, 3]
 rot_matrix = X_W_H[:3, :3]
 
 import transforms3d
+
 quat_wxyz = transforms3d.quaternions.mat2quat(rot_matrix)
 
-target_pose = Pose(torch.from_numpy(trans).float().cuda(), quaternion=torch.from_numpy(quat_wxyz).float().cuda())
+target_pose = Pose(
+    torch.from_numpy(trans).float().cuda(), quaternion=torch.from_numpy(quat_wxyz).float().cuda()
+)
 start_state = JointState.from_position(torch.from_numpy(DEFAULT_Q).float().cuda().view(1, -1))
 t_start = time.time()
 result = motion_gen.plan_single(
-        start_state=start_state,
-        goal_pose=target_pose,
-        plan_config=MotionGenPlanConfig(
-            enable_graph=True,
-            enable_opt=False,
-            max_attempts=10,
-            num_trajopt_seeds=10,
-            num_graph_seeds=10,
-        ),
+    start_state=start_state,
+    goal_pose=target_pose,
+    plan_config=MotionGenPlanConfig(
+        enable_graph=True,
+        enable_opt=False,
+        max_attempts=10,
+        num_trajopt_seeds=10,
+        num_graph_seeds=10,
+    ),
 )
 breakpoint()
+remove_collision_spheres()
 print(result)
 if result is None:
     print("IK Failed!")
     successes.append(False)
     trajs.append(DEFAULT_Q_FR3.reshape(1, -1).repeat(args.traj_len, axis=0))
     raise ValueError()
-print("Time taken: ", time.time()-t_start)
+print("Time taken: ", time.time() - t_start)
 print("Trajectory Generated: ", result.success)
 if not result.success:
     print(f"Traj failed")
@@ -278,17 +376,16 @@ for t in range(len(traj.position)):
     position = traj.position[t].cpu().numpy()
     assert position.shape == (DEFAULT_Q.shape[0],)
     print(f"{t} / {len(traj.position)} {position}")
-    #print(position)
+    # print(position)
 
     for i, joint_idx in enumerate(arm_actuatable_joint_idxs):
         pb.resetJointState(r, joint_idx, position[i])
     for i, joint_idx in enumerate(hand_actuatable_joint_idxs):
-        pb.resetJointState(r, joint_idx, position[i+7])
-    if args.pause: 
+        pb.resetJointState(r, joint_idx, position[i + 7])
+    if args.pause:
         input()
     time.sleep(0.001)
 
-collision_config = yaml.safe_load(open("/juno/u/tylerlum/github_repos/curobo/src/curobo/content/configs/robot/spheres/fr3_algr_zed2i.yml","r"))
 draw_collision_spheres(
     robot=r,
     config=collision_config,
@@ -303,7 +400,7 @@ from curobo.util_file import (
     get_world_configs_path,
     join_path,
     load_yaml,
-    )
+)
 from curobo.wrap.reacher.ik_solver import IKSolver, IKSolverConfig
 
 tensor_args = TensorDeviceType()
@@ -311,8 +408,12 @@ robot_cfg = RobotConfig.from_dict(
     load_yaml(join_path(get_robot_configs_path(), robot_file))["robot_cfg"]
 )
 
-robot_cfg.kinematics.kinematics_config.joint_limits.position[0, 7:] = torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() - 0.01
-robot_cfg.kinematics.kinematics_config.joint_limits.position[1, 7:] = torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() + 0.01
+robot_cfg.kinematics.kinematics_config.joint_limits.position[0, 7:] = (
+    torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() - 0.01
+)
+robot_cfg.kinematics.kinematics_config.joint_limits.position[1, 7:] = (
+    torch.from_numpy(DEFAULT_Q_ALGR).float().cuda() + 0.01
+)
 world_cfg = WorldConfig.from_dict(load_yaml(join_path(get_world_configs_path(), "TYLER_scene.yml")))
 ik_config = IKSolverConfig.load_from_robot_config(
     robot_cfg,
@@ -334,12 +435,14 @@ print(f"q_solution = {q_solution}")
 for i, joint_idx in enumerate(arm_actuatable_joint_idxs):
     pb.resetJointState(r, joint_idx, q_solution[0, i])
 for i, joint_idx in enumerate(hand_actuatable_joint_idxs):
-    pb.resetJointState(r, joint_idx, q_solution[0, i+7])
+    pb.resetJointState(r, joint_idx, q_solution[0, i + 7])
 
 from curobo.types.base import TensorDeviceType
 from curobo.wrap.model.robot_world import RobotWorld, RobotWorldConfig
-config = RobotWorldConfig.load_from_config(robot_cfg, "TYLER_scene.yml",
-                                          collision_activation_distance=0.0)
+
+config = RobotWorldConfig.load_from_config(
+    robot_cfg, "TYLER_scene.yml", collision_activation_distance=0.0
+)
 curobo_fn = RobotWorld(config)
 d_world, d_self = curobo_fn.get_world_self_collision_distance_from_joints(q_solution)
 state = curobo_fn.get_kinematics(q_solution)
@@ -347,8 +450,9 @@ print(f"d_world = {d_world}")
 print(f"d_self = {d_self}")
 breakpoint()
 
-config = RobotWorldConfig.load_from_config(robot_cfg, "TYLER_scene_with_object.yml",
-                                          collision_activation_distance=0.0)
+config = RobotWorldConfig.load_from_config(
+    robot_cfg, "TYLER_scene_with_object.yml", collision_activation_distance=0.0
+)
 curobo_fn = RobotWorld(config)
 d_world, d_self = curobo_fn.get_world_self_collision_distance_from_joints(q_solution)
 state = curobo_fn.get_kinematics(q_solution)
@@ -365,4 +469,4 @@ trajs.append(np.vstack([traj.position.cpu().numpy(), position.cpu().numpy()]))
 
 trajs = np.stack(trajs)
 print("Number of feasible trajectories:", len(trajs))
-np.savez("traj.npz", trajs = trajs, successes = successes)
+np.savez("traj.npz", trajs=trajs, successes=successes)
