@@ -63,7 +63,7 @@ robot_cfg:
         "fr3_link2": ["fr3_link3"],
         "fr3_link3": ["fr3_link4"],
         "fr3_link4": ["fr3_link5"],
-        "fr3_link5": ["fr3_link6"],
+        "fr3_link5": ["fr3_link6", "fr3_link7", "algr_rh_palm"],  # Extra collisions
         "fr3_link6": ["fr3_link7"],
         "fr3_link7": ["algr_rh_palm"],
         "algr_rh_palm":  ["algr_rh_if_bs", "algr_rh_mf_bs", "algr_rh_rf_bs", "algr_rh_th_mp"],
