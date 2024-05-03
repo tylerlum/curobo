@@ -28,7 +28,7 @@ robot_cfg:
 
     collision_link_names:
       [
-        "fr3_link0",
+        # "fr3_link0",  # Skip this link to avoid collision with the world
         "fr3_link1",
         "fr3_link2",
         "fr3_link3",
@@ -115,6 +115,7 @@ robot_cfg:
       joint_names: ['fr3_joint1', 'fr3_joint2', 'fr3_joint3', 'fr3_joint4', 'fr3_joint5', 'fr3_joint6', 'fr3_joint7', 'algr_rh_if_axl', 'algr_rh_if_mcp', 'algr_rh_if_pip', 'algr_rh_if_dip', 'algr_rh_mf_axl', 'algr_rh_mf_mcp', 'algr_rh_mf_pip', 'algr_rh_mf_dip', 'algr_rh_rf_axl', 'algr_rh_rf_mcp', 'algr_rh_rf_pip', 'algr_rh_rf_dip', 'algr_rh_th_cmc', 'algr_rh_th_axl', 'algr_rh_th_mcp', 'algr_rh_th_ipl']
       retract_config: [1.76261055e-06, -1.29018439, 0.00000000, -2.69272642, 0.00000000, 1.35254201, 7.85400000e-01, 2.90945620e-01, 7.37109400e-01, 5.10859200e-01, 1.22637060e-01, 1.20125350e-01, 5.84513500e-01, 3.43829930e-01, 6.05035000e-01, -2.68431900e-01, 8.78457900e-01, 8.49713500e-01, 8.97218400e-01, 1.33282830, 3.47787830e-01, 2.09215670e-01, -6.50969000e-03]
       null_space_weight: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+      cspace_distance_weight: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
       max_jerk: 500.0
      
       max_acceleration: 15.0
