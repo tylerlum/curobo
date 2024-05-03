@@ -22,7 +22,7 @@ from curobo.wrap.reacher.motion_gen import (
 )
 from scipy.spatial.transform import Rotation
 
-from typing import Optional
+from typing import Optional, Tuple
 from curobo.geom.types import WorldConfig
 from curobo.types.base import TensorDeviceType
 from curobo.types.math import Pose
@@ -35,14 +35,25 @@ from curobo.util_file import (
 )
 from curobo.wrap.reacher.ik_solver import IKSolver, IKSolverConfig
 import transforms3d
+import pathlib
+
+from curobo.types.base import TensorDeviceType
+from curobo.wrap.model.robot_world import RobotWorld, RobotWorldConfig
+from fr3_algr_zed2i_world import get_table_collision_dict, get_object_collision_dict
 
 
 def solve_ik(
     X_W_H: np.ndarray,
     q_algr_constraint: Optional[np.ndarray] = None,
     collision_check_object: bool = True,
+    obj_filepath: Optional[pathlib.Path] = pathlib.Path(
+        "/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/decomposed.obj"
+    ),
+    obj_xyz: Tuple[float, float, float] = (0.65, 0.0, 0.0),
+    obj_quat_wxyz: Tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0),
+    collision_check_table: bool = True,
 ) -> np.ndarray:
-    assert X_W_H.shape == (4, 4)
+    assert X_W_H.shape == (4, 4), f"X_W_H.shape: {X_W_H.shape}"
     trans = X_W_H[:3, 3]
     rot_matrix = X_W_H[:3, :3]
     quat_wxyz = transforms3d.quaternions.mat2quat(rot_matrix)
@@ -60,7 +71,9 @@ def solve_ik(
 
     # Apply joint limits
     if q_algr_constraint is not None:
-        assert q_algr_constraint.shape == (16,)
+        assert q_algr_constraint.shape == (
+            16,
+        ), f"q_algr_constraint.shape: {q_algr_constraint.shape}"
         assert robot_cfg.kinematics.kinematics_config.joint_limits.position.shape == (2, 23)
         robot_cfg.kinematics.kinematics_config.joint_limits.position[0, 7:] = (
             torch.from_numpy(q_algr_constraint).float().cuda() - 0.01
@@ -69,8 +82,14 @@ def solve_ik(
             torch.from_numpy(q_algr_constraint).float().cuda() + 0.01
         )
 
-    world_file = "TYLER_scene_with_object.yml" if collision_check_object else "TYLER_scene.yml"
-    world_cfg = WorldConfig.from_dict(load_yaml(join_path(get_world_configs_path(), world_file)))
+    world_dict = {}
+    if collision_check_table:
+        world_dict.update(get_table_collision_dict())
+    if collision_check_object and obj_filepath is not None:
+        world_dict.update(
+            get_object_collision_dict(file_path=obj_filepath, xyz=obj_xyz, quat_wxyz=obj_quat_wxyz)
+        )
+    world_cfg = WorldConfig.from_dict(world_dict)
     ik_config = IKSolverConfig.load_from_robot_config(
         robot_cfg,
         world_cfg,
@@ -91,6 +110,67 @@ def solve_ik(
     q_solution = result.solution[result.success]
     assert q_solution.shape == (1, 23)
     return q_solution.squeeze(dim=0).detach().cpu().numpy()
+
+
+def max_penetration_from_q(
+    q: np.ndarray,
+    include_object: bool = True,
+    obj_filepath: Optional[pathlib.Path] = pathlib.Path(
+        "/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/decomposed.obj"
+    ),
+    obj_xyz: Tuple[float, float, float] = (0.65, 0.0, 0.0),
+    obj_quat_wxyz: Tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0),
+    include_table: bool = True,
+) -> Tuple[np.ndarray, np.ndarray]:
+    N = q.shape[0]
+    assert q.shape == (N, 23), f"q.shape: {q.shape}"
+
+    robot_file = "fr3_algr_zed2i.yml"
+    robot_cfg = RobotConfig.from_dict(
+        load_yaml(join_path(get_robot_configs_path(), robot_file))["robot_cfg"]
+    )
+
+    world_dict = {}
+    if include_table:
+        world_dict.update(get_table_collision_dict())
+    if include_object and obj_filepath is not None:
+        world_dict.update(
+            get_object_collision_dict(file_path=obj_filepath, xyz=obj_xyz, quat_wxyz=obj_quat_wxyz)
+        )
+    world_cfg = WorldConfig.from_dict(world_dict)
+    config = RobotWorldConfig.load_from_config(
+        robot_cfg, world_cfg, collision_activation_distance=0.0
+    )
+    curobo_fn = RobotWorld(config)
+    d_world, d_self = curobo_fn.get_world_self_collision_distance_from_joints(
+        torch.from_numpy(q).float().cuda()
+    )
+    return d_world.detach().cpu().numpy(), d_self.detach().cpu().numpy()
+
+
+def max_penetration_from_X_W_H(
+    X_W_H: np.ndarray,
+    q_algr_constraint: np.ndarray,
+    include_object: bool = True,
+    obj_filepath: Optional[pathlib.Path] = pathlib.Path(
+        "/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/decomposed.obj"
+    ),
+    obj_xyz: Tuple[float, float, float] = (0.65, 0.0, 0.0),
+    obj_quat_wxyz: Tuple[float, float, float, float] = (1.0, 0.0, 0.0, 0.0),
+    include_table: bool = True,
+) -> Tuple[np.ndarray, np.ndarray]:
+
+    try:
+        q_solution = solve_ik(
+            X_W_H=X_W_H, q_algr_constraint=q_algr_constraint, collision_check_object=True, obj_filepath=obj_filepath, obj_xyz=obj_xyz, obj_quat_wxyz=obj_quat_wxyz, collision_check_table=True,
+        )
+        print("No penetrations found")
+        return max_
+    except RuntimeError:
+        q_solution = solve_ik(
+            X_W_H=X_W_H, q_algr_constraint=q_algr_constraint, collision_check_object=False
+        )
+    
 
 
 def main() -> None:
