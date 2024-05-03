@@ -1,0 +1,120 @@
+##
+## Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+##
+## NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+## property and proprietary rights in and to this material, related
+## documentation and any modifications thereto. Any use, reproduction,
+## disclosure or distribution of this material and related documentation
+## without an express license agreement from NVIDIA CORPORATION or
+## its affiliates is strictly prohibited.
+##
+
+robot_cfg:
+  kinematics:
+    usd_path: "FILL_THIS"
+    usd_robot_root: "/robot"
+    isaac_usd_path: ""
+    usd_flip_joints: {}
+    usd_flip_joint_limits: []
+
+    urdf_path: "robot/fr3_algr_zed2i/fr3_algr_zed2i.urdf"
+    asset_root_path: "robot/fr3_algr_zed2i"
+    
+    base_link: "world"
+    ee_link: "algr_rh_palm"
+    link_names: null
+    lock_joints: null
+    extra_links: null
+
+    collision_link_names:
+      [
+        "fr3_link0",
+        "fr3_link1",
+        "fr3_link2",
+        "fr3_link3",
+        "fr3_link4",
+        "fr3_link5",
+        "fr3_link6",
+        "fr3_link7",
+        "algr_rh_palm",
+        "algr_rh_if_bs",
+        "algr_rh_if_px",
+        "algr_rh_if_md",
+        "algr_rh_if_ds",
+        "algr_rh_mf_bs",
+        "algr_rh_mf_px",
+        "algr_rh_mf_md",
+        "algr_rh_mf_ds",
+        "algr_rh_rf_bs",
+        "algr_rh_rf_px",
+        "algr_rh_rf_md",
+        "algr_rh_rf_ds",
+        "algr_rh_th_mp",
+        "algr_rh_th_bs",
+        "algr_rh_th_px",
+        "algr_rh_th_ds"
+      ]
+    collision_spheres: "spheres/fr3_algr_zed2i.yml"
+    collision_sphere_buffer: 0.005 # float or Dict[str, float]
+    extra_collision_spheres: {}
+    self_collision_ignore: {
+        "fr3_link0": ["fr3_link1"],
+        "fr3_link1": ["fr3_link2"],
+        "fr3_link2": ["fr3_link3"],
+        "fr3_link3": ["fr3_link4"],
+        "fr3_link4": ["fr3_link5"],
+        "fr3_link5": ["fr3_link6"],
+        "fr3_link6": ["fr3_link7"],
+        "fr3_link7": ["algr_rh_palm"],
+        "algr_rh_palm": ["algr_rh_if_bs", "algr_rh_mf_bs", "algr_rh_rf_bs", "algr_rh_th_bs"],
+        "algr_rh_if_bs": ["algr_rh_if_px"],
+        "algr_rh_if_px": ["algr_rh_if_md"],
+        "algr_rh_if_md": ["algr_rh_if_ds"],
+        "algr_rh_mf_bs": ["algr_rh_mf_px"],
+        "algr_rh_mf_px": ["algr_rh_mf_md"],
+        "algr_rh_mf_md": ["algr_rh_mf_ds"],
+        "algr_rh_rf_bs": ["algr_rh_rf_px"],
+        "algr_rh_rf_px": ["algr_rh_rf_md"],
+        "algr_rh_rf_md": ["algr_rh_rf_ds"],
+        "algr_rh_th_bs": ["algr_rh_th_px"],
+        "algr_rh_th_px": ["algr_rh_th_ds"],
+        "algr_rh_th_ds": ["algr_rh_th_mp"]
+    }
+    self_collision_buffer: {
+        "fr3_link0": 0,
+        "fr3_link1": 0,
+        "fr3_link2": 0,
+        "fr3_link3": 0,
+        "fr3_link4": 0,
+        "fr3_link5": 0,
+        "fr3_link6": 0,
+        "fr3_link7": 0,
+        "algr_rh_palm": 0,
+        "algr_rh_if_bs": 0,
+        "algr_rh_if_px": 0,
+        "algr_rh_if_md": 0,
+        "algr_rh_if_ds": 0,
+        "algr_rh_mf_bs": 0,
+        "algr_rh_mf_px": 0,
+        "algr_rh_mf_md": 0,
+        "algr_rh_mf_ds": 0,
+        "algr_rh_rf_bs": 0,
+        "algr_rh_rf_px": 0,
+        "algr_rh_rf_md": 0,
+        "algr_rh_rf_ds": 0,
+        "algr_rh_th_bs": 0,
+        "algr_rh_th_px": 0,
+        "algr_rh_th_ds": 0,
+    }
+
+    use_global_cumul: True
+    mesh_link_names: null # List[str]
+    external_asset_path: null # Use this to add path for externally located assets/robot folder.
+
+    cspace:
+      joint_names: ['fr3_joint1', 'fr3_joint2', 'fr3_joint3', 'fr3_joint4', 'fr3_joint5', 'fr3_joint6', 'fr3_joint7', 'algr_rh_if_axl', 'algr_rh_if_mcp', 'algr_rh_if_pip', 'algr_rh_if_dip', 'algr_rh_mf_axl', 'algr_rh_mf_mcp', 'algr_rh_mf_pip', 'algr_rh_mf_dip', 'algr_rh_rf_axl', 'algr_rh_rf_mcp', 'algr_rh_rf_pip', 'algr_rh_rf_dip', 'algr_rh_th_cmc', 'algr_rh_th_axl', 'algr_rh_th_mcp', 'algr_rh_th_ipl']
+      retract_config: [1.76261055e-06, -1.29018439e00, 0.00000000e00, -2.69272642e00, 0.00000000e00, 1.35254201e00, 7.85400000e-01, 2.90945620e-01, 7.37109400e-01, 5.10859200e-01, 1.22637060e-01, 1.20125350e-01, 5.84513500e-01, 3.43829930e-01, 6.05035000e-01, -2.68431900e-01, 8.78457900e-01, 8.49713500e-01, 8.97218400e-01, 1.33282830e00, 3.47787830e-01, 2.09215670e-01, -6.50969000e-03]
+      null_space_weight: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+      max_jerk: 500.0
+     
+      max_acceleration: 15.0
