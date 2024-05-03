@@ -58,7 +58,7 @@ args = parser.parse_args()
 
 
 tensor_args = TensorDeviceType()
-world_file = "my_scene.yml"
+world_file = "TYLER_scene.yml"
 robot_file = "fr3_algr_zed2i.yml"
 robot_cfg = load_yaml(join_path(get_robot_configs_path(), robot_file))["robot_cfg"]
 robot_cfg = RobotConfig.from_dict(robot_cfg, tensor_args)
@@ -91,7 +91,8 @@ num_total_joints = pb.getNumJoints(r)
 assert num_total_joints == 39
 
 # obj = pb.loadURDF("/juno/u/tylerlum/github_repos/DexGraspNet/data/rotated_meshdata/core-bottle-109d55a137c042f5760315ac3bf2c13e/coacd/coacd.urdf", useFixedBase=True, basePosition=[1, 1, 1], baseOrientation=[0, 0, 0, 1])
-obj = pb.loadURDF("/juno/u/tylerlum/github_repos/pybullet-object-models/pybullet_object_models/ycb_objects/YcbBanana/model.urdf", useFixedBase=True, basePosition=[0.65, 0, 0,], baseOrientation=[0, 0, 0, 1])
+# obj = pb.loadURDF("/juno/u/tylerlum/github_repos/pybullet-object-models/pybullet_object_models/ycb_objects/YcbBanana/model.urdf", useFixedBase=True, basePosition=[0.65, 0, 0,], baseOrientation=[0, 0, 0, 1])
+obj = pb.loadURDF("/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/nerf_to_mesh/mug_330/coacd/coacd.urdf", useFixedBase=True, basePosition=[0.65, 0, 0,], baseOrientation=[0, 0, 0, 1])
 
 joint_names = [pb.getJointInfo(r, i)[1].decode("utf-8") for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED]
 link_names = [pb.getJointInfo(r, i)[12].decode("utf-8") for i in range(num_total_joints) if pb.getJointInfo(r, i)[2] != pb.JOINT_FIXED]
@@ -120,7 +121,7 @@ X_W_H = np.array(
         # [0.0, 0.0, 0.0, 1.0],
         [0, 0, 1, 0.4],
         [0, 1, 0, 0.0],
-        [-1, 0, 0, 0.3],
+        [-1, 0, 0, 0.15],
         [0.0, 0.0, 0.0, 1.0],
     ]
 )
