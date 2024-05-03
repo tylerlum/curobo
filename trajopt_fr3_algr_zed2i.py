@@ -1,6 +1,6 @@
 from curobo.geom.sdf.world import CollisionCheckerType
 from curobo.geom.types import WorldConfig
-from fr3_algr_zed2i_world import get_table_collision_dict, get_object_collision_dict
+from fr3_algr_zed2i_world import get_table_collision_dict, get_object_collision_dict, get_dummy_collision_dict
 import transforms3d
 import pathlib
 from typing import Optional, Tuple
@@ -104,6 +104,10 @@ def solve_trajopt(
     if collision_check_object and obj_filepath is not None:
         world_dict.update(
             get_object_collision_dict(file_path=obj_filepath, xyz=obj_xyz, quat_wxyz=obj_quat_wxyz)
+        )
+    if len(world_dict) == 0:
+        world_dict.update(
+            get_dummy_collision_dict()
         )
     world_cfg = WorldConfig.from_dict(world_dict)
 

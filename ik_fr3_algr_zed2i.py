@@ -25,7 +25,7 @@ import pathlib
 
 from curobo.types.base import TensorDeviceType
 from curobo.wrap.model.robot_world import RobotWorld, RobotWorldConfig
-from fr3_algr_zed2i_world import get_table_collision_dict, get_object_collision_dict
+from fr3_algr_zed2i_world import get_table_collision_dict, get_object_collision_dict, get_dummy_collision_dict
 
 
 def solve_ik(
@@ -77,6 +77,10 @@ def solve_ik(
         world_dict.update(
             get_object_collision_dict(file_path=obj_filepath, xyz=obj_xyz, quat_wxyz=obj_quat_wxyz)
         )
+    if len(world_dict) == 0:
+        world_dict.update(
+            get_dummy_collision_dict()
+        )
     world_cfg = WorldConfig.from_dict(world_dict)
     ik_config = IKSolverConfig.load_from_robot_config(
         robot_cfg,
@@ -125,6 +129,10 @@ def max_penetration_from_q(
     if include_object and obj_filepath is not None:
         world_dict.update(
             get_object_collision_dict(file_path=obj_filepath, xyz=obj_xyz, quat_wxyz=obj_quat_wxyz)
+        )
+    if len(world_dict) == 0:
+        world_dict.update(
+            get_dummy_collision_dict()
         )
     world_cfg = WorldConfig.from_dict(world_dict)
     config = RobotWorldConfig.load_from_config(

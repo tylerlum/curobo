@@ -45,7 +45,7 @@ BEST_IDX = 4
 GOOD_IDX = 0
 GOOD_IDX_2 = 1
 
-SELECTED_IDX = GOOD_IDX_2
+SELECTED_IDX = BEST_IDX
 
 trans = grasp_config_dict["trans"][SELECTED_IDX]
 rot = grasp_config_dict["rot"][SELECTED_IDX]
@@ -147,8 +147,118 @@ if d_world.item() > 0.0:
 if d_self.item() > 0.0:
     print("WARNING: self collision detected")
 
+d_world, d_self = max_penetration_from_X_W_H(
+    X_W_H=X_W_H,
+    q_algr_constraint=q_algr_pre,
+    include_object=False,
+    obj_filepath=OBJECT_OBJ_PATH,
+    obj_xyz=(0.65, 0.0, 0.0),
+    obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+    include_table=True,
+)
+print(f"Without object: d_world = {d_world}, d_self = {d_self}")
+
+d_world, d_self = max_penetration_from_X_W_H(
+    X_W_H=X_W_H,
+    q_algr_constraint=q_algr_pre,
+    include_object=True,
+    obj_filepath=OBJECT_OBJ_PATH,
+    obj_xyz=(0.65, 0.0, 0.0),
+    obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+    include_table=False,
+)
+print(f"Without table: d_world = {d_world}, d_self = {d_self}")
+
+d_world, d_self = max_penetration_from_X_W_H(
+    X_W_H=X_W_H,
+    q_algr_constraint=q_algr_pre,
+    include_object=False,
+    obj_filepath=OBJECT_OBJ_PATH,
+    obj_xyz=(0.65, 0.0, 0.0),
+    obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+    include_table=False,
+)
+print(f"Without object or table: d_world = {d_world}, d_self = {d_self}")
+
+open_hand_q_algr = q_algr_pre.copy()
+DELTA = 0.1
+open_hand_q_algr[1] -= DELTA
+open_hand_q_algr[2] -= DELTA
+open_hand_q_algr[3] -= DELTA
+
+open_hand_q_algr[5] -= DELTA
+open_hand_q_algr[6] -= DELTA
+open_hand_q_algr[7] -= DELTA
+
+open_hand_q_algr[9] -= DELTA
+open_hand_q_algr[10] -= DELTA
+open_hand_q_algr[11] -= DELTA
+d_world, d_self = max_penetration_from_X_W_H(
+    X_W_H=X_W_H,
+    q_algr_constraint=open_hand_q_algr,
+    include_object=True,
+    obj_filepath=OBJECT_OBJ_PATH,
+    obj_xyz=(0.65, 0.0, 0.0),
+    obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+    include_table=True,
+)
+print(f"DELTA = {DELTA}, d_world = {d_world}, d_self = {d_self}")
+
+open_hand_q_algr = q_algr_pre.copy()
+DELTA = 0.2
+open_hand_q_algr[1] -= DELTA
+open_hand_q_algr[2] -= DELTA
+open_hand_q_algr[3] -= DELTA
+
+open_hand_q_algr[5] -= DELTA
+open_hand_q_algr[6] -= DELTA
+open_hand_q_algr[7] -= DELTA
+
+open_hand_q_algr[9] -= DELTA
+open_hand_q_algr[10] -= DELTA
+open_hand_q_algr[11] -= DELTA
+d_world, d_self = max_penetration_from_X_W_H(
+    X_W_H=X_W_H,
+    q_algr_constraint=open_hand_q_algr,
+    include_object=True,
+    obj_filepath=OBJECT_OBJ_PATH,
+    obj_xyz=(0.65, 0.0, 0.0),
+    obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+    include_table=True,
+)
+print(f"DELTA = {DELTA}, d_world = {d_world}, d_self = {d_self}")
+
+open_hand_q_algr = q_algr_pre.copy()
+DELTA = 0.3
+open_hand_q_algr[1] -= DELTA
+open_hand_q_algr[2] -= DELTA
+open_hand_q_algr[3] -= DELTA
+
+open_hand_q_algr[5] -= DELTA
+open_hand_q_algr[6] -= DELTA
+open_hand_q_algr[7] -= DELTA
+
+open_hand_q_algr[9] -= DELTA
+open_hand_q_algr[10] -= DELTA
+open_hand_q_algr[11] -= DELTA
+d_world, d_self = max_penetration_from_X_W_H(
+    X_W_H=X_W_H,
+    q_algr_constraint=open_hand_q_algr,
+    include_object=True,
+    obj_filepath=OBJECT_OBJ_PATH,
+    obj_xyz=(0.65, 0.0, 0.0),
+    obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+    include_table=True,
+)
+print(f"DELTA = {DELTA}, d_world = {d_world}, d_self = {d_self}")
+
+
 # %%
+failed = False
 try:
+    print("=" * 80)
+    print("Trying with full object collision check")
+    print("=" * 80 + "\n")
     q, qd, qdd, dt, _ = solve_trajopt(
         X_W_H=X_W_H,
         q_algr_constraint=q_algr_pre,
@@ -158,18 +268,87 @@ try:
         obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
         collision_check_table=True,
     )
+    print("SUCCESS TRAJOPT with full object collision check")
 except RuntimeError as e:
-    print(f"FAILED TRAJOPT: {e}, retrying without object")
-    q, qd, qdd, dt, _ = solve_trajopt(
-        X_W_H=X_W_H,
-        q_algr_constraint=q_algr_pre,
-        collision_check_object=False,
-        obj_filepath=OBJECT_OBJ_PATH,
-        obj_xyz=(0.65, 0.0, 0.0),
-        obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
-        collision_check_table=True,
-    )
-    print("Succeeded without object")
+    print(f"FAILED TRAJOPT: {e} with full object collision check")
+    failed = True
+
+if failed:
+    print("=" * 80)
+    print("Trying with open hand")
+    print("=" * 80 + "\n")
+    failed = False
+    open_hand_q_algr = q_algr_pre.copy()
+    DELTA = 0.1
+    open_hand_q_algr[1] -= DELTA
+    open_hand_q_algr[2] -= DELTA
+    open_hand_q_algr[3] -= DELTA
+
+    open_hand_q_algr[5] -= DELTA
+    open_hand_q_algr[6] -= DELTA
+    open_hand_q_algr[7] -= DELTA
+
+    open_hand_q_algr[9] -= DELTA
+    open_hand_q_algr[10] -= DELTA
+    open_hand_q_algr[11] -= DELTA
+
+    old_q_algr_pre = q_algr_pre.copy()
+    q_algr_pre = open_hand_q_algr
+
+    try:
+        q, qd, qdd, dt, _ = solve_trajopt(
+            X_W_H=X_W_H,
+            q_algr_constraint=open_hand_q_algr,
+            collision_check_object=True,
+            obj_filepath=OBJECT_OBJ_PATH,
+            obj_xyz=(0.65, 0.0, 0.0),
+            obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+            collision_check_table=True,
+        )
+        print("SUCCESS TRAJOPT with open hand")
+    except RuntimeError as e:
+        print(f"FAILED TRAJOPT: {e} with open hand")
+        failed = True
+
+if failed:
+    print("=" * 80)
+    print("Trying without object")
+    print("=" * 80 + "\n")
+    failed = False
+    try:
+        q, qd, qdd, dt, _ = solve_trajopt(
+            X_W_H=X_W_H,
+            q_algr_constraint=q_algr_pre,
+            collision_check_object=False,
+            obj_filepath=OBJECT_OBJ_PATH,
+            obj_xyz=(0.65, 0.0, 0.0),
+            obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+            collision_check_table=True,
+        )
+        print("SUCCESS TRAJOPT without object collision check")
+    except RuntimeError as e:
+        print(f"FAILED TRAJOPT: {e} without object collision check")
+        failed = True
+
+if failed:
+    print("=" * 80)
+    print("Trying without object or table")
+    print("=" * 80 + "\n")
+    failed = False
+    try:
+        q, qd, qdd, dt, _ = solve_trajopt(
+            X_W_H=X_W_H,
+            q_algr_constraint=q_algr_pre,
+            collision_check_object=False,
+            obj_filepath=OBJECT_OBJ_PATH,
+            obj_xyz=(0.65, 0.0, 0.0),
+            obj_quat_wxyz=(1.0, 0.0, 0.0, 0.0),
+            collision_check_table=False,
+        )
+        print("SUCCESS TRAJOPT without object or table collision check")
+    except RuntimeError as e:
+        print(f"FAILED TRAJOPT: {e} without object or table collision check")
+        failed = True
 
 print(f"q.shape = {q.shape}, qd.shape = {qd.shape}, qdd.shape = {qdd.shape}, dt = {dt}")
 N_pts = q.shape[0]
@@ -272,3 +451,4 @@ draw_collision_spheres(
 # 
 # # %%
 # 
+# %%
