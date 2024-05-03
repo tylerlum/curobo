@@ -1,26 +1,13 @@
-from curobo.geom.sdf.world import CollisionCheckerType
-import yaml
-import trimesh
 from curobo.types.base import TensorDeviceType
 from curobo.types.math import Pose
-from curobo.types.robot import JointState, RobotConfig
-import pybullet as pb
-from argparse import ArgumentParser
+from curobo.types.robot import RobotConfig
 import torch
 import numpy as np
-import time
 from curobo.util_file import (
     get_robot_configs_path,
     join_path,
     load_yaml,
 )
-from curobo.wrap.reacher.motion_gen import (
-    MotionGen,
-    MotionGenConfig,
-    MotionGenPlanConfig,
-    PoseCostMetric,
-)
-from scipy.spatial.transform import Rotation
 
 from typing import Optional, Tuple
 from curobo.geom.types import WorldConfig
@@ -29,7 +16,6 @@ from curobo.types.math import Pose
 from curobo.types.robot import RobotConfig
 from curobo.util_file import (
     get_robot_configs_path,
-    get_world_configs_path,
     join_path,
     load_yaml,
 )
@@ -249,7 +235,7 @@ def main() -> None:
         q_collide_object = solve_ik(
             X_W_H=X_W_H_collide_object, q_algr_constraint=q_algr_pre, collision_check_object=True
         )
-        raise RuntimeError("Collision check failed to detect collision.")
+        raise ValueError("Collision check failed to detect collision.")
     except RuntimeError:
         print("Collision check successfully detected collision.")
         max_penetration_collide_object = max_penetration_from_X_W_H(
@@ -275,7 +261,7 @@ def main() -> None:
         q_collide_table = solve_ik(
             X_W_H=X_W_H_collide_table, q_algr_constraint=q_algr_pre, collision_check_object=False
         )
-        raise RuntimeError("Collision check failed to detect collision.")
+        raise ValueError("Collision check failed to detect collision.")
     except RuntimeError:
         print("Collision check successfully detected collision.")
         max_penetration_collide_table = max_penetration_from_X_W_H(
