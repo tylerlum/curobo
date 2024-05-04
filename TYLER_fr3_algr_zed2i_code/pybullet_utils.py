@@ -1,5 +1,6 @@
-import pybullet as pb
 from collections import defaultdict
+
+import pybullet as pb
 
 
 def get_link_com_xyz_orn(pb, body_id, link_id):

@@ -1,15 +1,15 @@
+import pathlib
+import time
+from typing import Optional, Tuple
+
+import numpy as np
+import torch
+import transforms3d
 from curobo.geom.sdf.world import CollisionCheckerType
 from curobo.geom.types import WorldConfig
-from fr3_algr_zed2i_world import get_table_collision_dict, get_object_collision_dict, get_dummy_collision_dict
-import transforms3d
-import pathlib
-from typing import Optional, Tuple
 from curobo.types.base import TensorDeviceType
 from curobo.types.math import Pose
 from curobo.types.robot import JointState, RobotConfig
-import torch
-import numpy as np
-import time
 from curobo.util_file import (
     get_robot_configs_path,
     join_path,
@@ -21,7 +21,11 @@ from curobo.wrap.reacher.motion_gen import (
     MotionGenPlanConfig,
     MotionGenResult,
 )
-
+from fr3_algr_zed2i_world import (
+    get_dummy_collision_dict,
+    get_object_collision_dict,
+    get_table_collision_dict,
+)
 
 DEFAULT_Q_FR3 = np.array(
     [

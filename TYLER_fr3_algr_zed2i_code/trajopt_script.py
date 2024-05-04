@@ -1,20 +1,24 @@
 # %%
 import pathlib
-import yaml
-import trimesh
-import pybullet as pb
-import numpy as np
 import time
-from pybullet_utils import draw_collision_spheres, remove_collision_spheres
-from trajopt_fr3_algr_zed2i import DEFAULT_Q_FR3, DEFAULT_Q_ALGR, solve_trajopt
-from ik_fr3_algr_zed2i import solve_ik, max_penetration_from_X_W_H, max_penetration_from_q
-from tqdm import tqdm
 
+import numpy as np
+import pybullet as pb
+import trimesh
+import yaml
 from curobo.util_file import (
     get_robot_configs_path,
     join_path,
     load_yaml,
 )
+from ik_fr3_algr_zed2i import (
+    max_penetration_from_q,
+    max_penetration_from_X_W_H,
+    solve_ik,
+)
+from pybullet_utils import draw_collision_spheres, remove_collision_spheres
+from tqdm import tqdm
+from trajopt_fr3_algr_zed2i import DEFAULT_Q_ALGR, DEFAULT_Q_FR3, solve_trajopt
 
 # %%
 FR3_ALGR_ZED2I_URDF_PATH = pathlib.Path("/juno/u/tylerlum/github_repos/nerf_grasping/nerf_grasping/fr3_algr_ik/allegro_ros2/models/fr3_algr_zed2i.urdf")

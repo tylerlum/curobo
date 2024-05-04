@@ -1,15 +1,9 @@
-from curobo.types.base import TensorDeviceType
-from curobo.types.math import Pose
-from curobo.types.robot import RobotConfig
-import torch
-import numpy as np
-from curobo.util_file import (
-    get_robot_configs_path,
-    join_path,
-    load_yaml,
-)
-
+import pathlib
 from typing import Optional, Tuple
+
+import numpy as np
+import torch
+import transforms3d
 from curobo.geom.types import WorldConfig
 from curobo.types.base import TensorDeviceType
 from curobo.types.math import Pose
@@ -19,13 +13,13 @@ from curobo.util_file import (
     join_path,
     load_yaml,
 )
-from curobo.wrap.reacher.ik_solver import IKSolver, IKSolverConfig
-import transforms3d
-import pathlib
-
-from curobo.types.base import TensorDeviceType
 from curobo.wrap.model.robot_world import RobotWorld, RobotWorldConfig
-from fr3_algr_zed2i_world import get_table_collision_dict, get_object_collision_dict, get_dummy_collision_dict
+from curobo.wrap.reacher.ik_solver import IKSolver, IKSolverConfig
+from fr3_algr_zed2i_world import (
+    get_dummy_collision_dict,
+    get_object_collision_dict,
+    get_table_collision_dict,
+)
 
 
 def solve_ik(
