@@ -18,6 +18,7 @@ from curobo.util_file import (
 
 # %%
 FR3_ALGR_ZED2I_URDF_PATH = pathlib.Path("/juno/u/tylerlum/github_repos/nerf_grasping/nerf_grasping/fr3_algr_ik/allegro_ros2/models/fr3_algr_zed2i.urdf")
+assert FR3_ALGR_ZED2I_URDF_PATH.exists()
 
 GRASP_CONFIG_DICTS_PATH = pathlib.Path(
     "/juno/u/tylerlum/github_repos/nerf_grasping/experiments/2024-05-02_16-19-22/optimized_grasp_config_dicts/mug_330_0_9999.npy"
