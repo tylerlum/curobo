@@ -24,6 +24,10 @@ robot_cfg:
     ee_link: "algr_rh_palm"
     link_names:
       [
+        "algr_rh_if_ds",
+        "algr_rh_mf_ds",
+        "algr_rh_rf_ds",
+        "algr_rh_th_ds",
       ]
     lock_joints: null
     extra_links: null
