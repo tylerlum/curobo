@@ -127,6 +127,8 @@ collision_spheres:
           "radius": 0.02
         - "center": [0.0, 0.0, 0.02]
           "radius": 0.02
+        - "center": [0.0, 0.0, 0.04]
+          "radius": 0.02
     algr_rh_if_md:
         - "center": [0.0, 0.0, 0.0]
           "radius": 0.02
@@ -146,6 +148,8 @@ collision_spheres:
         - "center": [0.0, 0.0, 0.0]
           "radius": 0.02
         - "center": [0.0, 0.0, 0.02]
+          "radius": 0.02
+        - "center": [0.0, 0.0, 0.04]
           "radius": 0.02
     algr_rh_mf_md:
         - "center": [0.0, 0.0, 0.0]
@@ -167,6 +171,8 @@ collision_spheres:
           "radius": 0.02
         - "center": [0.0, 0.0, 0.02]
           "radius": 0.02
+        - "center": [0.0, 0.0, 0.04]
+          "radius": 0.02
     algr_rh_rf_md:
         - "center": [0.0, 0.0, 0.0]
           "radius": 0.02
@@ -186,6 +192,8 @@ collision_spheres:
         - "center": [0.0, 0.0, 0.0]
           "radius": 0.02
         - "center": [0.0, 0.0, 0.02]
+          "radius": 0.02
+        - "center": [0.0, 0.0, 0.04]
           "radius": 0.02
     algr_rh_th_px:
         - "center": [0.0, 0.0, 0.0]
