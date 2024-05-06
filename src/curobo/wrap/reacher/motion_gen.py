@@ -3668,6 +3668,11 @@ class MotionGen(MotionGenConfig):
                     # )
                     result.interpolated_plan = self._batch_graph_search_buffer
                     g_dim = g_dim.cpu().squeeze().tolist()
+
+                    # Add to handle occasional case when g_dim isn't a list
+                    if isinstance(g_dim, int):
+                        g_dim = [g_dim]
+
                     for x, x_val in enumerate(g_dim):
                         self._batch_path_buffer_last_tstep[x_val] = (
                             graph_result.path_buffer_last_tstep[x]
