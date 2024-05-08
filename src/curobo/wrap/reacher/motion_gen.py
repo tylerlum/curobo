@@ -1895,6 +1895,7 @@ class MotionGen(MotionGenConfig):
                                 enable_graph=enable_graph,
                                 enable_graph_attempt=None if not enable_graph else 20,
                             ),
+                            link_poses=link_poses,
                         )
             else:
                 retract_pose = Pose(
