@@ -1430,7 +1430,7 @@ class MotionGen(MotionGenConfig):
         start_state: JointState,
         goal_pose: Pose,
         plan_config: MotionGenPlanConfig = MotionGenPlanConfig(),
-        link_poses: List[Pose] = None,
+        link_poses: Optional[Dict[str, Pose]] = None,
     ) -> MotionGenResult:
         """Plan a single motion to reach a goal pose from a start joint state.
 
@@ -1471,7 +1471,7 @@ class MotionGen(MotionGenConfig):
         start_state: JointState,
         goal_pose: Pose,
         plan_config: MotionGenPlanConfig = MotionGenPlanConfig(),
-        link_poses: List[Pose] = None,
+        link_poses: Optional[Dict[str, Pose]] = None,
     ) -> MotionGenResult:
         """Plan a single motion to reach a goal from set of poses, from a start joint state.
 
@@ -1510,7 +1510,7 @@ class MotionGen(MotionGenConfig):
         start_state: JointState,
         goal_pose: Pose,
         plan_config: MotionGenPlanConfig = MotionGenPlanConfig(),
-        link_poses: Dict[str, List[Pose]] = None,
+        link_poses: Optional[Dict[str, Pose]] = None,
     ) -> MotionGenResult:
         """Plan motions to reach a batch of goal poses from a batch of start joint states.
 
@@ -1544,7 +1544,7 @@ class MotionGen(MotionGenConfig):
         start_state: JointState,
         goal_pose: Pose,
         plan_config: MotionGenPlanConfig = MotionGenPlanConfig(),
-        link_poses: Dict[str, List[Pose]] = None,
+        link_poses: Optional[Dict[str, Pose]] = None,
     ) -> MotionGenResult:
         """Plan motions to reach a batch of poses (goalset) from a batch of start joint states.
 
@@ -1579,7 +1579,7 @@ class MotionGen(MotionGenConfig):
         start_state: JointState,
         goal_pose: Pose,
         plan_config: MotionGenPlanConfig = MotionGenPlanConfig(),
-        link_poses: Dict[str, List[Pose]] = None,
+        link_poses: Optional[Dict[str, Pose]] = None,
     ) -> MotionGenResult:
         """Plan motions to reach (batch) poses in different collision environments.
 
@@ -1625,7 +1625,7 @@ class MotionGen(MotionGenConfig):
         start_state: JointState,
         goal_pose: Pose,
         plan_config: MotionGenPlanConfig = MotionGenPlanConfig(),
-        link_poses: Dict[str, List[Pose]] = None,
+        link_poses: Optional[Dict[str, Pose]] = None,
     ) -> MotionGenResult:
         """Plan motions to reach (batch) goalset poses in different collision environments.
 
@@ -1663,6 +1663,7 @@ class MotionGen(MotionGenConfig):
             start_state,
             goal_pose,
             plan_config,
+            link_poses=link_poses,
         )
         return result
 
@@ -1757,6 +1758,7 @@ class MotionGen(MotionGenConfig):
         n_goalset: int = -1,
         warmup_joint_index: int = 0,
         warmup_joint_delta: float = 0.1,
+        use_link_poses: bool = False,
     ):
         """Warmup planning methods for motion generation.
 
@@ -1774,6 +1776,8 @@ class MotionGen(MotionGenConfig):
                 and the method will internally pad the extra goals with the first goal.
             warmup_joint_index: Index of the joint to perturb for warmup.
             warmup_joint_delta: Delta to perturb the joint for warmup.
+            use_link_poses: Use poses of other links for warmup. This is needed when you will be planning
+                for multiple links in the robot.
         """
         log_info("Warmup")
         if warmup_js_trajopt:
@@ -1817,7 +1821,7 @@ class MotionGen(MotionGenConfig):
                             enable_finetune_trajopt=True,
                             parallel_finetune=parallel_finetune,
                         ),
-                        link_poses=link_poses,
+                        link_poses=link_poses if use_link_poses else None,
                     )
 
                 self.plan_single(
@@ -1829,7 +1833,7 @@ class MotionGen(MotionGenConfig):
                         enable_graph=enable_graph,
                         parallel_finetune=parallel_finetune,
                     ),
-                    link_poses=link_poses,
+                    link_poses=link_poses if use_link_poses else None,
                 )
             else:
                 retract_pose = Pose(
@@ -1846,7 +1850,7 @@ class MotionGen(MotionGenConfig):
                             enable_finetune_trajopt=True,
                             parallel_finetune=parallel_finetune,
                         ),
-                        link_poses=link_poses,
+                        link_poses=link_poses if use_link_poses else None,
                     )
 
                 self.plan_goalset(
@@ -1858,7 +1862,7 @@ class MotionGen(MotionGenConfig):
                         enable_graph=enable_graph,
                         parallel_finetune=parallel_finetune,
                     ),
-                    link_poses=link_poses,
+                    link_poses=link_poses if use_link_poses else None,
                 )
 
         else:
@@ -1884,6 +1888,7 @@ class MotionGen(MotionGenConfig):
                                 enable_graph=False,
                                 enable_graph_attempt=None,
                             ),
+                            link_poses=link_poses if use_link_poses else None,
                         )
                     else:
                         self.plan_batch(
@@ -1895,7 +1900,7 @@ class MotionGen(MotionGenConfig):
                                 enable_graph=enable_graph,
                                 enable_graph_attempt=None if not enable_graph else 20,
                             ),
-                            link_poses=link_poses,
+                            link_poses=link_poses if use_link_poses else None,
                         )
             else:
                 retract_pose = Pose(
@@ -1915,6 +1920,7 @@ class MotionGen(MotionGenConfig):
                                 enable_finetune_trajopt=True,
                                 enable_graph=False,
                             ),
+                            link_poses=link_poses if use_link_poses else None,
                         )
                     else:
                         self.plan_batch_goalset(
@@ -1926,6 +1932,7 @@ class MotionGen(MotionGenConfig):
                                 enable_graph=enable_graph,
                                 enable_graph_attempt=None if not enable_graph else 20,
                             ),
+                            link_poses=link_poses if use_link_poses else None,
                         )
 
         log_info("Warmup complete")
@@ -2739,7 +2746,7 @@ class MotionGen(MotionGenConfig):
         start_state: JointState,
         goal_pose: Pose,
         plan_config: MotionGenPlanConfig = MotionGenPlanConfig(),
-        link_poses: List[Pose] = None,
+        link_poses: Optional[Dict[str, Pose]] = None,
     ):
         """Call many planning attempts for a given reacher solve state.
 
