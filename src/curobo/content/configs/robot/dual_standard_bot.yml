@@ -1,0 +1,112 @@
+##
+## Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+##
+## NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+## property and proprietary rights in and to this material, related
+## documentation and any modifications thereto. Any use, reproduction,
+## disclosure or distribution of this material and related documentation
+## without an express license agreement from NVIDIA CORPORATION or
+## its affiliates is strictly prohibited.
+##
+
+robot_cfg:
+  kinematics:
+    usd_path: "FILL_THIS"
+    usd_robot_root: "/robot"
+    isaac_usd_path: ""
+    usd_flip_joints: {}
+    usd_flip_joint_limits: []
+
+    urdf_path: "robot/standard_bots_description/urdf/dual_sbot_modified.urdf"
+    asset_root_path: "robot/standard_bots_description"
+
+    base_link: "world"
+    ee_link: "gripper"
+    link_names: ["gripper", "gripper_2"]
+    lock_joints: null
+    extra_links: null
+
+    collision_link_names: [
+        # "base_link",  # Skip this link to avoid collision with the world
+        "shoulder_link",
+        "upper_arm_link",
+        "forearm_link",
+        "wrist_1_link",
+        "wrist_2_link",
+        "wrist_3_link",
+        # "gripper",  # Skip this link since no geometry
+        # "base_link_2",  # Skip this link to avoid collision with the world
+        "shoulder_link_2",
+        "upper_arm_link_2",
+        "forearm_link_2",
+        "wrist_1_link_2",
+        "wrist_2_link_2",
+        "wrist_3_link_2",
+        # "gripper_2",  # Skip this link since no geometry
+      ]
+    collision_spheres: "spheres/dual_standard_bot.yml"
+    collision_sphere_buffer: 0.005 # float or Dict[str, float]
+    extra_collision_spheres: {}
+    self_collision_ignore:
+      {
+        "base_link": ["shoulder_link"],
+        "shoulder_link": ["upper_arm_link"],
+        "upper_arm_link": ["forearm_link"],
+        "forearm_link": ["wrist_1_link"],
+        "wrist_1_link": ["wrist_2_link"],
+        "wrist_2_link": ["wrist_3_link"],
+        "wrist_3_link": ["gripper"],
+        "base_link_2": ["shoulder_link_2"],
+        "shoulder_link_2": ["upper_arm_link_2"],
+        "upper_arm_link_2": ["forearm_link_2"],
+        "forearm_link_2": ["wrist_1_link_2"],
+        "wrist_1_link_2": ["wrist_2_link_2"],
+        "wrist_2_link_2": ["wrist_3_link_2"],
+        "wrist_3_link_2": ["gripper_2"],
+      }
+    self_collision_buffer:
+      {
+        "base_link": 0.0,
+        "shoulder_link": 0.0,
+        "upper_arm_link": 0.0,
+        "forearm_link": 0.0,
+        "wrist_1_link": 0.0,
+        "wrist_2_link": 0.0,
+        "wrist_3_link": 0.0,
+        "gripper": 0.0,
+        "base_link_2": 0.0,
+        "shoulder_link_2": 0.0,
+        "upper_arm_link_2": 0.0,
+        "forearm_link_2": 0.0,
+        "wrist_1_link_2": 0.0,
+        "wrist_2_link_2": 0.0,
+        "wrist_3_link_2": 0.0,
+        "gripper_2": 0.0,
+      }
+
+    use_global_cumul: True
+    mesh_link_names: null # List[str]
+    external_asset_path: null # Use this to add path for externally located assets/robot folder.
+
+    cspace:
+      joint_names: ["joint0", "joint1", "joint2", "joint3", "joint4", "joint5",
+                    "joint0_2", "joint1_2", "joint2_2", "joint3_2", "joint4_2", "joint5_2",
+      ] # List[str]
+      retract_config: [
+          -1.5585,
+          0.7451,
+          -2.3698,
+          0.0541,
+          1.5708,
+          3.1531,
+          -1.5585,
+          0.7451,
+          -2.3698,
+          0.0541,
+          1.5708,
+          3.1531,
+        ] # List[float]
+      null_space_weight: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] # List[str]
+      cspace_distance_weight: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] # List[str]
+      max_jerk: 500.0
+      max_acceleration: 15.0
