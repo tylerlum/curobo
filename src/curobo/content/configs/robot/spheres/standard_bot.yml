@@ -1,0 +1,71 @@
+##
+## Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+##
+## NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+## property and proprietary rights in and to this material, related
+## documentation and any modifications thereto. Any use, reproduction,
+## disclosure or distribution of this material and related documentation
+## without an express license agreement from NVIDIA CORPORATION or
+## its affiliates is strictly prohibited.
+##
+
+collision_spheres:
+  base_link:
+    # - "center": [0.0, 0.0, 10.0]
+    #   "radius": 0.1
+    - "center": [0.0, 0.0, 0.03]
+      "radius": 0.12
+    - "center": [0.0, 0.0, 0.15]
+      "radius": 0.12
+  shoulder_link:
+    # - "center": [0.0, 0.0, 10.0]
+    #   "radius": 0.1
+    - "center": [-0.1, 0.0, 0.0]
+      "radius": 0.1
+    - "center": [-0.2, 0.0, 0.0]
+      "radius": 0.1
+  upper_arm_link:
+    - "center": [0.0, 0.0, -0.2]
+      "radius": 0.1
+    - "center": [0.0, 0.0, -0.1]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.0]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.1]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.2]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.3]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.33]
+      "radius": 0.1
+  forearm_link:
+    - "center": [0.0, 0.0, -0.3]
+      "radius": 0.1
+    - "center": [0.0, 0.0, -0.2]
+      "radius": 0.1
+    - "center": [0.0, 0.0, -0.1]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.0]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.1]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.2]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.23]
+      "radius": 0.1
+  wrist_1_link:
+    - "center": [0.0, 0.0, 0.0]
+      "radius": 0.1
+    - "center": [0.0, 0.0, 0.1]
+      "radius": 0.1
+  wrist_2_link:
+    - "center": [0.0, 0.0, 0.0]
+      "radius": 0.07
+    - "center": [-0.07, 0.0, 0.0]
+      "radius": 0.07
+  wrist_3_link:
+    - "center": [0.0, 0.0, 0.0]
+      "radius": 0.06
+    - "center": [0.02, 0.0, 0.0]
+      "radius": 0.06
