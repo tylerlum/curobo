@@ -760,6 +760,17 @@ class WorldPrimitiveCollision(WorldCollision):
         else:
             log_error("obstacle not found in OBB world model: " + name)
 
+    def update_obstacle_poses(
+        self,
+        name: str,
+        w_obj_pose: Pose,
+        env_idxs: torch.Tensor,
+    ):
+        # HACK: Assumes that all environments have same obstacles
+        obj_w_pose = self._get_obstacle_poses(w_obj_pose, None)
+        obs_idx = self.get_obb_idx(name, env_idxs[0].item())  # Assume all are same
+        self._cube_tensor_list[1][env_idxs, obs_idx, :7] = obj_w_pose.get_pose_vector()
+
     def update_obb_pose(
         self,
         w_obj_pose: Optional[Pose] = None,
