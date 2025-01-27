@@ -161,6 +161,17 @@ class WrapBase(WrapConfig):
                     act, self.use_cuda_graph_metrics
                 )  # TODO: use cuda graph for metrics
 
+        print(f"act: {act}")
+        print(f"self.safety_rollout.compute_kinematics(act).ee_pose: {self.safety_rollout.compute_kinematics(act).ee_pose}")
+        print(f"self.safety_rollout._goal_buffer.goal_pose: {self.safety_rollout._goal_buffer.goal_pose}")
+        print(f"act_seq: {act_seq}")
+        # breakpoint()
+        print(f"metrics.pose_error: {metrics.pose_error}")
+        print(f"metrics.position_error: {metrics.position_error}")
+        print(f"metrics.rotation_error: {metrics.rotation_error}")
+        print()
+
+
         result = WrapResult(
             action=act,
             solve_time=self.opt_dt,

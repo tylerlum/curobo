@@ -427,6 +427,7 @@ class ArmBase(RolloutBase, ArmBaseConfig):
             _type_: _description_
 
         """
+        # breakpoint()
         if isinstance(state, JointState):
             state = self._get_augmented_state(state)
         out_metrics = self.constraint_fn(state)

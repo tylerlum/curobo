@@ -340,6 +340,7 @@ class ArmReacher(ArmBase, ArmReacherConfig):
         out_metrics = super(ArmReacher, self).convergence_fn(state, out_metrics)
 
         # compute error with pose?
+        # breakpoint()
         if (
             self._goal_buffer.goal_pose.position is not None
             and self.convergence_cfg.pose_cfg is not None
@@ -351,6 +352,13 @@ class ArmReacher(ArmBase, ArmReacherConfig):
             ) = self.pose_convergence.forward_out_distance(
                 state.ee_pos_seq, state.ee_quat_seq, self._goal_buffer
             )
+            # print(f"state.ee_pos_seq: {state.ee_pos_seq}")
+            # print(f"state.ee_quat_seq: {state.ee_quat_seq}")
+            # print(f"out_metrics.pose_error: {out_metrics.pose_error}")
+            # print(f"out_metrics.rotation_error: {out_metrics.rotation_error}")
+            # print(f"out_metrics.position_error: {out_metrics.position_error}")
+            # print(f"state.state_seq: {state.state_seq}")
+            # print()
             out_metrics.goalset_index = self.pose_convergence.goalset_index_buffer  # .clone()
         if (
             self._goal_buffer.links_goal_pose is not None

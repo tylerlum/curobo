@@ -377,7 +377,8 @@ class CudaRobotGenerator(CudaRobotGeneratorConfig):
         self.ee_link = ee_link
         self.joint_names = []
         self._fixed_transform = []
-        chain_link_names = self._kinematics_parser.get_chain(base_link, ee_link)
+        # chain_link_names = self._kinematics_parser.get_chain(base_link, ee_link)
+        chain_link_names = self._kinematics_parser.get_chain(base_link, "palm_link")
         self._add_body_to_tree(chain_link_names[0], base=True)
         for i, l_name in enumerate(chain_link_names[1:]):
             self._add_body_to_tree(l_name)
