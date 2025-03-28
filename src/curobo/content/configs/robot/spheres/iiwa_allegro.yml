@@ -42,6 +42,11 @@ collision_spheres:
     - center: [0.0, 0.25, 0.0]
       radius: 0.1
 
+  iiwa14_link_5:
+    # Dummy
+    - center: [0.0, 0.0, 0.0]
+      radius: 0.0001
+
   iiwa14_link_6:
     # #8: "iiwa14_link_6_sphere2" offset xyz="0 0 0" radius 0.1
     - center: [0.0, 0.0, 0.0]
