@@ -1,0 +1,228 @@
+##
+## Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+##
+## NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+## property and proprietary rights in and to this material, related
+## documentation and any modifications thereto. Any use, reproduction,
+## disclosure or distribution of this material and related documentation
+## without an express license agreement from NVIDIA CORPORATION or
+## its affiliates is strictly prohibited.
+##
+robot_cfg:
+  kinematics:
+    base_link: iiwa14_link_0
+    collision_link_names:
+      - iiwa14_link_1
+      - iiwa14_link_2
+      - iiwa14_link_3
+      - iiwa14_link_4
+      - iiwa14_link_5
+      - iiwa14_link_6
+      # - palm_link
+      # - mcp_joint
+      # - pip
+      # - dip
+      # - fingertip
+      # - mcp_joint_2
+      # - pip_2
+      # - dip_2
+      # - fingertip_2
+      # - mcp_joint_3
+      # - pip_3
+      # - dip_3
+      # - fingertip_3
+      # - pip_4
+      # - thumb_pip
+      # - thumb_dip
+      # - thumb_fingertip
+    mesh_link_names:
+      - iiwa14_link_1
+      - iiwa14_link_2
+      - iiwa14_link_3
+      - iiwa14_link_4
+      - iiwa14_link_5
+      - iiwa14_link_6
+      # - palm_link
+      # - mcp_joint
+      # - pip
+      # - dip
+      # - fingertip
+      # - mcp_joint_2
+      # - pip_2
+      # - dip_2
+      # - fingertip_2
+      # - mcp_joint_3
+      # - pip_3
+      # - dip_3
+      # - fingertip_3
+      # - pip_4
+      # - thumb_pip
+      # - thumb_dip
+      # - thumb_fingertip
+    collision_sphere_buffer: 0.005
+    collision_spheres: spheres/iiwa_leap.yml
+    ee_link: palm_link
+    link_names:
+      - palm_link
+      - fingertip
+      - fingertip_2
+      - fingertip_3
+      - thumb_fingertip
+    self_collision_buffer:
+      iiwa14_link_1: -0.02
+      iiwa14_link_2: 0.0
+      iiwa14_link_3: 0.0
+      iiwa14_link_4: 0.0
+      iiwa14_link_5: 0.0
+      iiwa14_link_6: 0.0
+      mcp_joint: 0.0
+      pip: 0.0
+      dip: 0.0
+      fingertip: 0.0
+      mcp_joint_2: 0.0
+      pip_2: 0.0
+      dip_2: 0.0
+      fingertip_2: 0.0
+      mcp_joint_3: 0.0
+      pip_3: 0.0
+      dip_3: 0.0
+      fingertip_3: 0.0
+      pip_4: 0.0
+      thumb_pip: 0.0
+      thumb_dip: 0.0
+      thumb_fingertip: 0.0
+    self_collision_ignore: {
+        iiwa14_link_1: [iiwa14_link_2, iiwa14_link_3],
+        iiwa14_link_2: [iiwa14_link_3, iiwa14_link_4],
+        iiwa14_link_3: [iiwa14_link_4, iiwa14_link_5],
+        iiwa14_link_4: [iiwa14_link_5, iiwa14_link_6],
+        iiwa14_link_5: [iiwa14_link_6, palm_link],
+        iiwa14_link_6: [palm_link],
+        palm_link:
+          [
+            mcp_joint,
+            pip,
+            mcp_joint_2,
+            pip_2,
+            mcp_joint_3,
+            pip_3,
+            pip_4,
+            thumb_pip,
+          ],
+        mcp_joint: [pip, pip_2],
+        pip: [dip, dip_2],
+        mcp_joint_2: [pip_2, pip_3],
+        pip_2: [dip_2, dip_3],
+        mcp_joint_3: [pip_3, thumb_pip],
+        pip_3: [dip_3, thumb_dip],
+        #ring_link_3: [iiwa14_link_2],
+        pip_4: [thumb_pip],
+        thumb_pip: [thumb_dip],
+      }
+    #thumb_link_3: [iiwa14_link_2],
+    urdf_path: robot/iiwa_leap_description/iiwa_leap.urdf
+    asset_root_path: robot/iiwa_leap_description
+    usd_path: robot/iiwa_leap_description/iiwa_leap.usda
+    usd_robot_root: /iiwa_leap
+    cspace:
+      joint_names:
+        [
+          "iiwa14_joint_1",
+          "iiwa14_joint_2",
+          "iiwa14_joint_3",
+          "iiwa14_joint_4",
+          "iiwa14_joint_5",
+          "iiwa14_joint_6",
+          "iiwa14_joint_7",
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+        ]
+      cspace_distance_weight:
+        - 1.0
+        - 0.9
+        - 0.8
+        - 0.8
+        - 0.7
+        - 0.6
+        - 0.5
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 1.1
+        - 1.1
+        - 0.1
+        - 0.1
+
+      null_space_weight:
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+      retract_config:
+        - 0.0
+        - -0.78
+        - 0.0
+        - -1.4
+        - 0.0
+        - 0.6
+        - 2.1
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+      max_acceleration: 15.0
+      max_jerk: 500.0
