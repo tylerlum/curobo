@@ -1,0 +1,395 @@
+##
+## Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+##
+## NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
+## property and proprietary rights in and to this material, related
+## documentation and any modifications thereto. Any use, reproduction,
+## disclosure or distribution of this material and related documentation
+## without an express license agreement from NVIDIA CORPORATION or
+## its affiliates is strictly prohibited.
+##
+robot_cfg:
+  kinematics:
+    base_link: base_link
+    collision_link_names:
+      - right_iiwa14_link_1
+      - right_iiwa14_link_2
+      - right_iiwa14_link_3
+      - right_iiwa14_link_4
+      - right_iiwa14_link_5
+      - right_iiwa14_link_6
+      - right_palm_link
+      - right_index_link_1
+      - right_index_link_2
+      - right_index_link_3
+      - right_middle_link_1
+      - right_middle_link_2
+      - right_middle_link_3
+      - right_ring_link_1
+      - right_ring_link_2
+      - right_ring_link_3
+      - right_thumb_link_2
+      - right_thumb_link_3
+      - left_iiwa14_link_1
+      - left_iiwa14_link_2
+      - left_iiwa14_link_3
+      - left_iiwa14_link_4
+      - left_iiwa14_link_5
+      - left_iiwa14_link_6
+      - left_palm_link
+      - left_index_link_1
+      - left_index_link_2
+      - left_index_link_3
+      - left_middle_link_1
+      - left_middle_link_2
+      - left_middle_link_3
+      - left_ring_link_1
+      - left_ring_link_2
+      - left_ring_link_3
+      - left_thumb_link_2
+      - left_thumb_link_3
+    mesh_link_names:
+      - right_iiwa14_link_1
+      - right_iiwa14_link_2
+      - right_iiwa14_link_3
+      - right_iiwa14_link_4
+      - right_iiwa14_link_5
+      - right_iiwa14_link_6
+      - right_palm_link
+      - right_index_link_1
+      - right_index_link_2
+      - right_index_link_3
+      - right_middle_link_1
+      - right_middle_link_2
+      - right_middle_link_3
+      - right_ring_link_1
+      - right_ring_link_2
+      - right_ring_link_3
+      - right_thumb_link_2
+      - right_thumb_link_3
+      - left_iiwa14_link_1
+      - left_iiwa14_link_2
+      - left_iiwa14_link_3
+      - left_iiwa14_link_4
+      - left_iiwa14_link_5
+      - left_iiwa14_link_6
+      - left_palm_link
+      - left_index_link_1
+      - left_index_link_2
+      - left_index_link_3
+      - left_middle_link_1
+      - left_middle_link_2
+      - left_middle_link_3
+      - left_ring_link_1
+      - left_ring_link_2
+      - left_ring_link_3
+      - left_thumb_link_2
+      - left_thumb_link_3
+    collision_sphere_buffer: 0.005
+    collision_spheres: spheres/bimanual_iiwa_allegro.yml
+    ee_link: right_palm_link
+    link_names:
+      - right_palm_link
+      - right_index_link_3
+      - right_middle_link_3
+      - right_ring_link_3
+      - right_thumb_link_3
+      - left_palm_link
+      - left_index_link_3
+      - left_middle_link_3
+      - left_ring_link_3
+      - left_thumb_link_3
+    self_collision_buffer:
+      right_iiwa14_link_1: -0.02
+      right_iiwa14_link_2: 0.0
+      right_iiwa14_link_3: 0.0
+      right_iiwa14_link_4: 0.0
+      right_iiwa14_link_5: 0.0
+      right_iiwa14_link_6: 0.0
+      right_index_link_1: -0.0
+      right_index_link_2: -0.0
+      right_index_link_3: 0.0
+      right_middle_link_1: 0.0
+      right_middle_link_2: 0.0
+      right_middle_link_3: 0.0
+      right_palm_link: 0.0
+      right_ring_link_1: 0.0
+      right_ring_link_2: 0.0
+      right_ring_link_3: 0.0
+      right_thumb_link_2: 0.0
+      right_thumb_link_3: 0.0
+      left_iiwa14_link_1: -0.02
+      left_iiwa14_link_2: 0.0
+      left_iiwa14_link_3: 0.0
+      left_iiwa14_link_4: 0.0
+      left_iiwa14_link_5: 0.0
+      left_iiwa14_link_6: 0.0
+      left_index_link_1: -0.0
+      left_index_link_2: -0.0
+      left_index_link_3: 0.0
+      left_middle_link_1: 0.0
+      left_middle_link_2: 0.0
+      left_middle_link_3: 0.0
+      left_palm_link: 0.0
+      left_ring_link_1: 0.0
+      left_ring_link_2: 0.0
+      left_ring_link_3: 0.0
+      left_thumb_link_2: 0.0
+      left_thumb_link_3: 0.0
+    self_collision_ignore: {
+        right_iiwa14_link_1: [right_iiwa14_link_2, right_iiwa14_link_3],
+        right_iiwa14_link_2: [right_iiwa14_link_3, right_iiwa14_link_4],
+        right_iiwa14_link_3: [right_iiwa14_link_4, right_iiwa14_link_5],
+        right_iiwa14_link_4: [right_iiwa14_link_5, right_iiwa14_link_6],
+        right_iiwa14_link_5: [right_iiwa14_link_6, right_palm_link],
+        right_iiwa14_link_6: [right_palm_link],
+        right_palm_link:
+          [
+            right_index_link_1,
+            right_index_link_2,
+            right_middle_link_1,
+            right_middle_link_2,
+            right_ring_link_1,
+            right_ring_link_2,
+            right_thumb_link_2,
+          ],
+        right_index_link_1: [right_index_link_2, right_middle_link_1, right_middle_link_2],
+        right_index_link_2: [right_index_link_3],
+        #right_index_link_3: [right_iiwa14_link_2],
+        right_middle_link_1: [right_middle_link_2, right_ring_link_1, right_ring_link_2],
+        right_middle_link_2: [right_middle_link_3],
+        #right_middle_link_3: [],
+        right_ring_link_1: [right_ring_link_2],
+        right_ring_link_2: [right_ring_link_3],
+        #right_ring_link_3: [right_iiwa14_link_2],
+        right_thumb_link_2: [right_thumb_link_3],
+        left_iiwa14_link_1: [left_iiwa14_link_2, left_iiwa14_link_3],
+        left_iiwa14_link_2: [left_iiwa14_link_3, left_iiwa14_link_4],
+        left_iiwa14_link_3: [left_iiwa14_link_4, left_iiwa14_link_5],
+        left_iiwa14_link_4: [left_iiwa14_link_5, left_iiwa14_link_6],
+        left_iiwa14_link_5: [left_iiwa14_link_6, left_palm_link],
+        left_iiwa14_link_6: [left_palm_link],
+        left_palm_link:
+          [
+            left_index_link_1,
+            left_index_link_2,
+            left_middle_link_1,
+            left_middle_link_2,
+            left_ring_link_1,
+            left_ring_link_2,
+            left_thumb_link_2,
+          ],
+        left_index_link_1: [left_index_link_2, left_middle_link_1, left_middle_link_2],
+        left_index_link_2: [left_index_link_3],
+        #left_index_link_3: [left_iiwa14_link_2],
+        left_middle_link_1: [left_middle_link_2, left_ring_link_1, left_ring_link_2],
+        left_middle_link_2: [left_middle_link_3],
+        #left_middle_link_3: [],
+        left_ring_link_1: [left_ring_link_2],
+        left_ring_link_2: [left_ring_link_3],
+        #left_ring_link_3: [left_iiwa14_link_2],
+        left_thumb_link_2: [left_thumb_link_3],
+      }
+    #right_thumb_link_3: [right_iiwa14_link_2],
+    #left_thumb_link_3: [left_iiwa14_link_2],
+    urdf_path: robot/bimanual_kuka_allegro/bimanual_kuka_allegro.urdf
+    asset_root_path: robot/bimanual_kuka_allegro
+    usd_path: robot/bimanual_kuka_allegro/bimanual_kuka_allegro.usda
+    usd_robot_root: /bimanual_kuka_allegro
+    cspace:
+      joint_names:
+        [
+          "right_iiwa14_joint_1",
+          "right_iiwa14_joint_2",
+          "right_iiwa14_joint_3",
+          "right_iiwa14_joint_4",
+          "right_iiwa14_joint_5",
+          "right_iiwa14_joint_6",
+          "right_iiwa14_joint_7",
+          "right_index_joint_0",
+          "right_index_joint_1",
+          "right_index_joint_2",
+          "right_index_joint_3",
+          "right_middle_joint_0",
+          "right_middle_joint_1",
+          "right_middle_joint_2",
+          "right_middle_joint_3",
+          "right_ring_joint_0",
+          "right_ring_joint_1",
+          "right_ring_joint_2",
+          "right_ring_joint_3",
+          "right_thumb_joint_0",
+          "right_thumb_joint_1",
+          "right_thumb_joint_2",
+          "right_thumb_joint_3",
+          "left_iiwa14_joint_1",
+          "left_iiwa14_joint_2",
+          "left_iiwa14_joint_3",
+          "left_iiwa14_joint_4",
+          "left_iiwa14_joint_5",
+          "left_iiwa14_joint_6",
+          "left_iiwa14_joint_7",
+          "left_index_joint_0",
+          "left_index_joint_1",
+          "left_index_joint_2",
+          "left_index_joint_3",
+          "left_middle_joint_0",
+          "left_middle_joint_1",
+          "left_middle_joint_2",
+          "left_middle_joint_3",
+          "left_ring_joint_0",
+          "left_ring_joint_1",
+          "left_ring_joint_2",
+          "left_ring_joint_3",
+          "left_thumb_joint_0",
+          "left_thumb_joint_1",
+          "left_thumb_joint_2",
+          "left_thumb_joint_3",
+        ]
+      cspace_distance_weight:
+        - 1.0
+        - 0.9
+        - 0.8
+        - 0.8
+        - 0.7
+        - 0.6
+        - 0.5
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 1.1
+        - 1.1
+        - 0.1
+        - 0.1
+        - 1.0
+        - 0.9
+        - 0.8
+        - 0.8
+        - 0.7
+        - 0.6
+        - 0.5
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 0.1
+        - 1.1
+        - 1.1
+        - 0.1
+        - 0.1
+
+      null_space_weight:
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+        - 1.0
+
+      retract_config:
+        - 0.0
+        - -0.78
+        - 0.0
+        - -1.4
+        - 0.0
+        - 0.6
+        - 2.1
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - -0.78
+        - 0.0
+        - -1.4
+        - 0.0
+        - 0.6
+        - 2.1
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+        - 0.0
+ 
+
+      max_acceleration: 15.0
+      max_jerk: 500.0
