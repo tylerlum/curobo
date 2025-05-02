@@ -2314,7 +2314,7 @@
     <limit effort="15" lower="-0.47" upper="0.47" velocity="7"/>
     <parent link="left_palm_link"/>
     <child link="left_index_link_0"/>
-    <origin rpy="0.08726646255 0 0" xyz="0 -0.0435 -0.001542"/>
+    <origin rpy="-0.08726646255 0 0" xyz="0 0.0435 -0.001542"/>
     <dynamics damping="3" friction="10"/>
   </joint>
   <!-- [LINK 1, 5, 9] -->
@@ -2427,7 +2427,6 @@
     <child link="left_index_biotac_tip"/>
     <origin rpy="0 0 0" xyz="0 0 0.0267"/>
   </joint>
-
   <!-- [LINK 0, 4, 8] -->
   <link name="left_middle_link_0">
     <visual>
@@ -2591,7 +2590,7 @@
     <limit effort="15" lower="-0.47" upper="0.47" velocity="7"/>
     <parent link="left_palm_link"/>
     <child link="left_ring_link_0"/>
-    <origin rpy="-0.08726646255 0 0" xyz="0 0.0435 -0.001542"/>
+    <origin rpy="0.08726646255 0 0" xyz="0 -0.0435 -0.001542"/>
     <dynamics damping="3" friction="10"/>
   </joint>
   <!-- [LINK 1, 5, 9] -->
@@ -2704,7 +2703,6 @@
     <child link="left_ring_biotac_tip"/>
     <origin rpy="0 0 0" xyz="0 0 0.0267"/>
   </joint>
-
   <!-- THUMB -->
   <!-- [LINK 12] -->
   <link name="left_thumb_link_0">
